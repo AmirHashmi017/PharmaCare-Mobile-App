@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MediQuick</string>
+    <string name="tagline">Smart Pharmacy System</string>
+    <string name="subtitle">Manage inventory, process sales &amp; track records — all offline, all seamless.</string>
+    <string name="get_started">Get Started</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Create Account</string>
+    <string name="full_name">Full Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="pharmacy_name">Pharmacy Name</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="already_have_account">Already have an account? Sign In</string>
+    <string name="no_account">Don\'t have an account? Sign Up</string>
+    <string name="feature_inventory">Inventory</string>
+    <string name="feature_inventory_sub">Add, edit &amp; track stock</string>
+    <string name="feature_billing">Billing</string>
+    <string name="feature_billing_sub">Cart, receipts &amp; invoices</string>
+    <string name="feature_sales">Sales History</string>
+    <string name="feature_sales_sub">View all transactions</string>
+    <string name="feature_alerts">Low Stock Alerts</string>
+    <string name="feature_alerts_sub">Never run out again</string>
+    <string name="offline_badge">100% Offline Ready</string>
+    <string name="offline_sub">SQLite powered — no internet needed</string>
+    <string name="version">v1.0</string>
+</resources>

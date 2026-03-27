@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="navy">#0D1B3E</color>
+    <color name="navy_mid">#152347</color>
+    <color name="navy_card">#1E2F5A</color>
+    <color name="green_primary">#27A85F</color>
+    <color name="green_dark">#1D8B4C</color>
+    <color name="green_light">#E8F7EF</color>
+    <color name="gold">#F5A623</color>
+    <color name="surface">#F0F3FA</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text_hint">#9DAAC2</color>
+    <color name="text_secondary">#6B7B9A</color>
+    <color name="border">#E2E8F5</color>
+    <color name="error">#E5534B</color>
+    <color name="black">#000000</color>
+</resources>
