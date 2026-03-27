@@ -17,9 +17,16 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SignInActivity" android:exported="false"/>
-        <activity android:name=".SignUpActivity" android:exported="false"/>
-        <activity android:name=".MainActivity" android:exported="false"/>
+        <activity android:name=".SignInActivity"   android:exported="false"/>
+        <activity android:name=".SignUpActivity"   android:exported="false"/>
+        <activity android:name=".MainActivity"     android:exported="false"/>
+        <activity android:name=".InventoryActivity"       android:exported="false"/>
+        <activity android:name=".AddEditMedicineActivity" android:exported="false"/>
+        <activity android:name=".BillingActivity"         android:exported="false"/>
+        <activity android:name=".ReceiptActivity"         android:exported="false"/>
+        <activity android:name=".SalesHistoryActivity"    android:exported="false"/>
+        <activity android:name=".LowStockActivity"        android:exported="false"/>
 
     </application>
+
 </manifest>
