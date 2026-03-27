@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         refreshStats()
 
-        // Nav cards
+
         findViewById<androidx.cardview.widget.CardView>(R.id.cardInventory).setOnClickListener {
             startActivity(Intent(this, InventoryActivity::class.java))
         }
@@ -38,12 +38,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, LowStockActivity::class.java))
         }
 
-        // FAB → quick add medicine
+
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             startActivity(Intent(this, AddEditMedicineActivity::class.java))
         }
 
-        // Logout
+
         findViewById<TextView>(R.id.tvLogout).setOnClickListener {
             UserPrefs.setLoggedIn(this, false)
             startActivity(Intent(this, LandingActivity::class.java).apply {

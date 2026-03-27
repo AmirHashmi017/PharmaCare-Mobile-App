@@ -6,8 +6,8 @@ data class Medicine(
     val category: String,
     val price: Double,
     val stock: Int,
-    val unit: String,          // tablets, ml, capsules, etc.
-    val expiryDate: String,    // yyyy-MM-dd
+    val unit: String,
+    val expiryDate: String,
     val manufacturer: String,
-    val minStock: Int = 10     // threshold for low-stock alert
+    val minStock: Int = 10
 )

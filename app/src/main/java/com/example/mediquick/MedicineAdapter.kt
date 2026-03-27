@@ -42,12 +42,12 @@ class MedicineAdapter(
         h.tvStock.text    = "${m.stock} ${m.unit}"
         h.tvExpiry.text   = "Exp: ${m.expiryDate}"
 
-        // Low stock badge
+
         val isLow = m.stock <= m.minStock
         h.tvStockBadge.visibility = if (isLow) View.VISIBLE else View.GONE
         h.tvStock.setTextColor(if (isLow) Color.parseColor("#E5534B") else Color.parseColor("#27A85F"))
 
-        // Buttons visibility
+
         h.btnEdit.visibility    = if (onEdit    != null) View.VISIBLE else View.GONE
         h.btnDelete.visibility  = if (onDelete  != null) View.VISIBLE else View.GONE
         h.btnAddCart.visibility = if (onAddCart != null) View.VISIBLE else View.GONE

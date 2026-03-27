@@ -38,17 +38,17 @@ class InventoryActivity : AppCompatActivity() {
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
 
-        // Search
+
         findViewById<EditText>(R.id.etSearch).addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = loadData()
             override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
             override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
         })
 
-        // Category spinner
+
         setupCategorySpinner()
 
-        // FAB
+
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             startActivity(Intent(this, AddEditMedicineActivity::class.java))
         }

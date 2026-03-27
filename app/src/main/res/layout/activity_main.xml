@@ -77,7 +77,6 @@
                 android:layout_marginTop="24dp"
                 android:weightSum="2">
 
-                <!-- Total Medicines -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -112,7 +111,6 @@
 
                 </LinearLayout>
 
-                <!-- Low Stock -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -157,7 +155,6 @@
                 android:layout_marginTop="10dp"
                 android:weightSum="2">
 
-                <!-- Today Sales -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -192,7 +189,6 @@
 
                 </LinearLayout>
 
-                <!-- Total Sales Count -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -518,18 +514,19 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+        <!-- FAB moved INSIDE LinearLayout -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:src="@android:drawable/ic_input_add"
+            app:backgroundTint="@color/green_primary"
+            app:tint="@color/white"
+            app:fabSize="normal" />
 
-    <!-- FAB -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/green_primary"
-        app:tint="@color/white"
-        app:fabSize="normal" />
+    </LinearLayout>
 
 </ScrollView>

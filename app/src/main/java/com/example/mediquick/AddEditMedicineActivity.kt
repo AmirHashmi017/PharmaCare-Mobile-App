@@ -37,11 +37,11 @@ class AddEditMedicineActivity : AppCompatActivity() {
         val tvExpiry   = findViewById<TextView>(R.id.tvExpiry)
         val btnSave    = findViewById<Button>(R.id.btnSave)
 
-        // Unit spinner
+
         val units = listOf("tablets", "capsules", "ml", "mg", "sachets", "bottles", "strips", "pcs")
         spinUnit.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, units)
 
-        // Expiry date picker
+
         tvExpiry.setOnClickListener {
             val cal = Calendar.getInstance()
             DatePickerDialog(this, { _, y, m, d ->
@@ -50,7 +50,7 @@ class AddEditMedicineActivity : AppCompatActivity() {
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        // Populate if edit
+
         if (isEdit) {
             db.getMedicineById(editId)?.let { m ->
                 etName.setText(m.name)
@@ -75,7 +75,7 @@ class AddEditMedicineActivity : AppCompatActivity() {
             val mfr      = etMfr.text.toString().trim()
             val unit     = spinUnit.selectedItem.toString()
 
-            // Validation
+
             if (name.isEmpty())          { tilError(R.id.tilName, "Required"); return@setOnClickListener }
             if (category.isEmpty())      { tilError(R.id.tilCategory, "Required"); return@setOnClickListener }
             if (priceStr.isEmpty())      { tilError(R.id.tilPrice, "Required"); return@setOnClickListener }

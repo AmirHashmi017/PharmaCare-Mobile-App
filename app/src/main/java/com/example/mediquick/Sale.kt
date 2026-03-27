@@ -3,7 +3,7 @@ package com.example.mediquick
 data class Sale(
     val id: Long = 0,
     val customerName: String,
-    val date: String,          // yyyy-MM-dd HH:mm
+    val date: String,
     val total: Double,
     val items: List<SaleItem> = emptyList()
 )

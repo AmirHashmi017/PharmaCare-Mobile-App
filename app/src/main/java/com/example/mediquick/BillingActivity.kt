@@ -27,26 +27,26 @@ class BillingActivity : AppCompatActivity() {
 
         findViewById<ImageView>(R.id.ivBack).setOnClickListener { finish() }
 
-        // Medicine list (search + add to cart)
         val rvMeds = findViewById<RecyclerView>(R.id.rvMedicines)
         medAdapter = MedicineAdapter(medicines, onEdit = null, onDelete = null) { med -> addToCart(med) }
         rvMeds.layoutManager = LinearLayoutManager(this)
         rvMeds.adapter = medAdapter
 
-        // Cart list
         val rvCart = findViewById<RecyclerView>(R.id.rvCart)
-        cartAdapter = CartAdapter(cart) { pos -> removeFromCart(pos) }
+        cartAdapter = CartAdapter(
+            cart,
+            onRemove = { pos -> removeFromCart(pos) },
+            onQuantityChanged = { updateTotal() }
+        )
         rvCart.layoutManager = LinearLayoutManager(this)
         rvCart.adapter = cartAdapter
 
-        // Search
         findViewById<EditText>(R.id.etSearch).addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = loadMedicines()
             override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
             override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
         })
 
-        // Checkout
         findViewById<Button>(R.id.btnCheckout).setOnClickListener { checkout() }
 
         loadMedicines()
@@ -85,7 +85,7 @@ class BillingActivity : AppCompatActivity() {
         updateTotal()
     }
 
-    private fun updateTotal() {
+    fun updateTotal() {
         val total = cart.sumOf { it.subtotal }
         val fmt = java.text.DecimalFormat("#,##0.00")
         findViewById<TextView>(R.id.tvTotal).text = "Total: Rs ${fmt.format(total)}"
@@ -102,7 +102,6 @@ class BillingActivity : AppCompatActivity() {
         val sale = Sale(customerName = customer, date = sdf.format(java.util.Date()), total = total)
         val saleId = db.insertSale(sale, cart)
 
-        // Go to receipt
         startActivity(
             Intent(this, ReceiptActivity::class.java)
                 .putExtra("sale_id", saleId)
@@ -114,10 +113,11 @@ class BillingActivity : AppCompatActivity() {
     }
 }
 
-// ── Cart Adapter ──────────────────────────────────────────────────────────────
+
 class CartAdapter(
     private val items: MutableList<CartItem>,
-    private val onRemove: (Int) -> Unit
+    private val onRemove: (Int) -> Unit,
+    private val onQuantityChanged: () -> Unit
 ) : RecyclerView.Adapter<CartAdapter.VH>() {
 
     inner class VH(v: View) : RecyclerView.ViewHolder(v) {
@@ -142,12 +142,22 @@ class CartAdapter(
         h.tvSubtotal.text = "Rs ${fmt.format(item.subtotal)}"
 
         h.btnMinus.setOnClickListener {
-            if (item.quantity > 1) { item.quantity--; notifyItemChanged(pos) }
-            else { onRemove(pos) }
+            if (item.quantity > 1) {
+                item.quantity--
+                notifyItemChanged(pos)
+                onQuantityChanged()
+            } else {
+                onRemove(pos)
+            }
         }
         h.btnPlus.setOnClickListener {
-            if (item.quantity < item.medicine.stock) { item.quantity++; notifyItemChanged(pos) }
-            else Toast.makeText(h.itemView.context, "Max stock reached", Toast.LENGTH_SHORT).show()
+            if (item.quantity < item.medicine.stock) {
+                item.quantity++
+                notifyItemChanged(pos)
+                onQuantityChanged()
+            } else {
+                Toast.makeText(h.itemView.context, "Max stock reached", Toast.LENGTH_SHORT).show()
+            }
         }
         h.btnRemove.setOnClickListener { onRemove(pos) }
     }

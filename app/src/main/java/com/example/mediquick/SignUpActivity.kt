@@ -1,4 +1,4 @@
-// app/src/main/java/com/yourpkg/mediquick/SignUpActivity.kt
+
 package com.example.mediquick
 
 import android.content.Intent
@@ -16,7 +16,7 @@ class SignUpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // One account per device — bounce to sign in if already registered
+
         if (UserPrefs.hasAccount(this)) {
             Toast.makeText(this, "Account already exists on this device.", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, SignInActivity::class.java))
@@ -58,7 +58,7 @@ class SignUpActivity : AppCompatActivity() {
             val password = etPassword.text.toString()
             val confirm  = etConfirm.text.toString()
 
-            // Validation
+
             when {
                 name.isEmpty()     -> { tilName.error = "Enter your full name"; return@setOnClickListener }
                 pharmacy.isEmpty() -> { tilPharmacy.error = "Enter pharmacy name"; return@setOnClickListener }

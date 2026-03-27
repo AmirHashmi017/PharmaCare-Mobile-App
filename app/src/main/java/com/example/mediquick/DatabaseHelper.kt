@@ -12,7 +12,7 @@ class DatabaseHelper(context: Context) :
         private const val DB_NAME    = "mediquick.db"
         private const val DB_VERSION = 1
 
-        // ── Medicines ──────────────────────────────────────────────────────
+
         const val TBL_MED   = "medicines"
         const val COL_ID    = "id"
         const val COL_NAME  = "name"
@@ -24,13 +24,13 @@ class DatabaseHelper(context: Context) :
         const val COL_MFR   = "manufacturer"
         const val COL_MIN   = "min_stock"
 
-        // ── Sales ──────────────────────────────────────────────────────────
+
         const val TBL_SALE  = "sales"
         const val COL_CUST  = "customer_name"
         const val COL_DATE  = "date"
         const val COL_TOTAL = "total"
 
-        // ── Sale Items ─────────────────────────────────────────────────────
+
         const val TBL_ITEM  = "sale_items"
         const val COL_SID   = "sale_id"
         const val COL_MID   = "medicine_id"
@@ -75,7 +75,7 @@ class DatabaseHelper(context: Context) :
             )
         """.trimIndent())
 
-        // Seed some sample medicines
+
         seedSampleData(db)
     }
 
@@ -111,9 +111,6 @@ class DatabaseHelper(context: Context) :
         }
     }
 
-    // ──────────────────────────────────────────────────────────────────────
-    // Medicine CRUD
-    // ──────────────────────────────────────────────────────────────────────
 
     fun insertMedicine(m: Medicine): Long {
         val cv = ContentValues().apply {
@@ -192,9 +189,6 @@ class DatabaseHelper(context: Context) :
         minStock     = c.getInt(c.getColumnIndexOrThrow(COL_MIN))
     )
 
-    // ──────────────────────────────────────────────────────────────────────
-    // Sales
-    // ──────────────────────────────────────────────────────────────────────
 
     fun insertSale(sale: Sale, items: List<CartItem>): Long {
         val db = writableDatabase
@@ -215,7 +209,7 @@ class DatabaseHelper(context: Context) :
                     put(COL_EACH, item.medicine.price)
                 }
                 db.insert(TBL_ITEM, null, iv)
-                // Reduce stock
+
                 db.execSQL(
                     "UPDATE $TBL_MED SET $COL_STOCK = $COL_STOCK - ? WHERE $COL_ID = ?",
                     arrayOf(item.quantity, item.medicine.id)
@@ -270,7 +264,7 @@ class DatabaseHelper(context: Context) :
         return list
     }
 
-    // ── Dashboard stats ────────────────────────────────────────────────────
+
     fun getTotalMedicines(): Int {
         val c = readableDatabase.rawQuery("SELECT COUNT(*) FROM $TBL_MED", null)
         return c.use { if (it.moveToFirst()) it.getInt(0) else 0 }

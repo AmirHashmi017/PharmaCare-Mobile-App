@@ -1,4 +1,4 @@
-// app/src/main/java/com/yourpkg/mediquick/SignInActivity.kt
+
 package com.example.mediquick
 
 import android.content.Intent
@@ -61,7 +61,7 @@ class SignInActivity : AppCompatActivity() {
             }
         }
 
-        // Show sign up link only if no account yet
+
         val tvGoSignUp = findViewById<TextView>(R.id.tvGoSignUp)
         if (UserPrefs.hasAccount(this)) {
             tvGoSignUp.visibility = View.GONE
