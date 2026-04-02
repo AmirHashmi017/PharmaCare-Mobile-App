@@ -10,7 +10,7 @@ class DatabaseHelper(context: Context) :
 
     companion object {
         private const val DB_NAME    = "mediquick.db"
-        private const val DB_VERSION = 1
+        private const val DB_VERSION = 2
 
 
         const val TBL_MED   = "medicines"
@@ -23,6 +23,7 @@ class DatabaseHelper(context: Context) :
         const val COL_EXP   = "expiry_date"
         const val COL_MFR   = "manufacturer"
         const val COL_MIN   = "min_stock"
+        const val COL_IMG   = "image_uri"
 
 
         const val TBL_SALE  = "sales"
@@ -50,7 +51,8 @@ class DatabaseHelper(context: Context) :
                 $COL_UNIT  TEXT NOT NULL DEFAULT 'tablets',
                 $COL_EXP   TEXT NOT NULL,
                 $COL_MFR   TEXT NOT NULL,
-                $COL_MIN   INTEGER NOT NULL DEFAULT 10
+                $COL_MIN   INTEGER NOT NULL DEFAULT 10,
+                $COL_IMG   TEXT
             )
         """.trimIndent())
 
@@ -80,10 +82,9 @@ class DatabaseHelper(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TBL_ITEM")
-        db.execSQL("DROP TABLE IF EXISTS $TBL_SALE")
-        db.execSQL("DROP TABLE IF EXISTS $TBL_MED")
-        onCreate(db)
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE $TBL_MED ADD COLUMN $COL_IMG TEXT")
+        }
     }
 
     private fun seedSampleData(db: SQLiteDatabase) {
@@ -118,6 +119,7 @@ class DatabaseHelper(context: Context) :
             put(COL_PRICE, m.price); put(COL_STOCK, m.stock)
             put(COL_UNIT, m.unit); put(COL_EXP, m.expiryDate)
             put(COL_MFR, m.manufacturer); put(COL_MIN, m.minStock)
+            put(COL_IMG, m.imageUri)
         }
         return writableDatabase.insert(TBL_MED, null, cv)
     }
@@ -128,6 +130,7 @@ class DatabaseHelper(context: Context) :
             put(COL_PRICE, m.price); put(COL_STOCK, m.stock)
             put(COL_UNIT, m.unit); put(COL_EXP, m.expiryDate)
             put(COL_MFR, m.manufacturer); put(COL_MIN, m.minStock)
+            put(COL_IMG, m.imageUri)
         }
         return writableDatabase.update(TBL_MED, cv, "$COL_ID=?", arrayOf(m.id.toString()))
     }
@@ -186,7 +189,8 @@ class DatabaseHelper(context: Context) :
         unit         = c.getString(c.getColumnIndexOrThrow(COL_UNIT)),
         expiryDate   = c.getString(c.getColumnIndexOrThrow(COL_EXP)),
         manufacturer = c.getString(c.getColumnIndexOrThrow(COL_MFR)),
-        minStock     = c.getInt(c.getColumnIndexOrThrow(COL_MIN))
+        minStock     = c.getInt(c.getColumnIndexOrThrow(COL_MIN)),
+        imageUri     = c.getString(c.getColumnIndexOrThrow(COL_IMG)).takeUnless { it.isNullOrBlank() }
     )
 
 

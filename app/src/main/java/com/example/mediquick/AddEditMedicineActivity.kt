@@ -1,10 +1,12 @@
 package com.example.mediquick
 
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.util.*
@@ -14,6 +16,22 @@ class AddEditMedicineActivity : AppCompatActivity() {
     private lateinit var db: DatabaseHelper
     private var editId: Long = -1
     private var selectedExpiry = ""
+    private var selectedImageUri: Uri? = null
+
+    private val pickImage = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            try {
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: SecurityException) {
+                // ignore: some providers don't support persistable permissions
+            }
+            selectedImageUri = uri
+            renderSelectedImage()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +54,11 @@ class AddEditMedicineActivity : AppCompatActivity() {
         val spinUnit   = findViewById<Spinner>(R.id.spinnerUnit)
         val tvExpiry   = findViewById<TextView>(R.id.tvExpiry)
         val btnSave    = findViewById<Button>(R.id.btnSave)
+        val btnPick    = findViewById<TextView>(R.id.btnPickImage)
+
+        btnPick.setOnClickListener {
+            pickImage.launch(arrayOf("image/*"))
+        }
 
 
         val units = listOf("tablets", "capsules", "ml", "mg", "sachets", "bottles", "strips", "pcs")
@@ -63,6 +86,8 @@ class AddEditMedicineActivity : AppCompatActivity() {
                 tvExpiry.text  = m.expiryDate
                 val unitIdx = units.indexOf(m.unit).coerceAtLeast(0)
                 spinUnit.setSelection(unitIdx)
+                selectedImageUri = m.imageUri?.let { Uri.parse(it) }
+                renderSelectedImage()
             }
         }
 
@@ -91,13 +116,36 @@ class AddEditMedicineActivity : AppCompatActivity() {
                 unit         = unit,
                 expiryDate   = selectedExpiry,
                 manufacturer = mfr,
-                minStock     = minStr.toIntOrNull() ?: 10
+                minStock     = minStr.toIntOrNull() ?: 10,
+                imageUri     = selectedImageUri?.toString()
             )
 
             if (isEdit) db.updateMedicine(med) else db.insertMedicine(med)
             Toast.makeText(this, if (isEdit) "Medicine updated!" else "Medicine added!", Toast.LENGTH_SHORT).show()
             finish()
         }
+    }
+
+    private fun renderSelectedImage() {
+        val iv = findViewById<ImageView>(R.id.ivMedicineImage)
+        val tvFallback = findViewById<TextView>(R.id.tvMedicineImageFallback)
+        val tvStatus = findViewById<TextView>(R.id.tvMedicineImageStatus)
+        val btnPick = findViewById<TextView>(R.id.btnPickImage)
+
+        val uri = selectedImageUri
+        if (uri == null) {
+            iv.visibility = View.GONE
+            tvFallback.visibility = View.VISIBLE
+            tvStatus.text = getString(R.string.optional)
+            btnPick.text = getString(R.string.add_photo)
+            return
+        }
+
+        iv.setImageURI(uri)
+        iv.visibility = View.VISIBLE
+        tvFallback.visibility = View.GONE
+        tvStatus.text = uri.lastPathSegment ?: getString(R.string.optional)
+        btnPick.text = getString(R.string.change_photo)
     }
 
     private fun tilError(tilId: Int, msg: String) {

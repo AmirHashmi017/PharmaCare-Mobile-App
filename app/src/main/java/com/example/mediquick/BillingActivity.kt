@@ -28,7 +28,7 @@ class BillingActivity : AppCompatActivity() {
         findViewById<ImageView>(R.id.ivBack).setOnClickListener { finish() }
 
         val rvMeds = findViewById<RecyclerView>(R.id.rvMedicines)
-        medAdapter = MedicineAdapter(medicines, onEdit = null, onDelete = null) { med -> addToCart(med) }
+        medAdapter = MedicineAdapter(medicines, onEdit = null, onDelete = null, onAddCart = { med -> addToCart(med) })
         rvMeds.layoutManager = LinearLayoutManager(this)
         rvMeds.adapter = medAdapter
 

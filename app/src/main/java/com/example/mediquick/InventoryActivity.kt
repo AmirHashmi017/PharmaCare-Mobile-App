@@ -33,7 +33,8 @@ class InventoryActivity : AppCompatActivity() {
         adapter = MedicineAdapter(medicines,
             onEdit   = { med -> startActivity(Intent(this, AddEditMedicineActivity::class.java).putExtra("medicine_id", med.id)) },
             onDelete = { med -> confirmDelete(med) },
-            onAddCart= null
+            onAddCart= null,
+            editActionText = getString(R.string.edit)
         )
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter

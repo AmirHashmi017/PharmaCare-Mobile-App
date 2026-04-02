@@ -26,7 +26,8 @@ class LowStockActivity : AppCompatActivity() {
         rv.adapter = MedicineAdapter(list,
             onEdit   = { med -> startActivity(Intent(this, AddEditMedicineActivity::class.java).putExtra("medicine_id", med.id)) },
             onDelete = null,
-            onAddCart= null
+            onAddCart= null,
+            editActionText = getString(R.string.update)
         )
 
         if (list.isEmpty()) {

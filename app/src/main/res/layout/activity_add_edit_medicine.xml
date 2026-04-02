@@ -3,40 +3,40 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/surface">
+    android:background="@color/surface"
+    android:orientation="vertical">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/navy"
-        android:paddingTop="48dp"
-        android:paddingBottom="16dp"
-        android:paddingHorizontal="20dp"
+        android:background="@drawable/bg_header_gradient"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="16dp">
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@android:drawable/ic_media_previous"
-            android:tint="@color/white"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
-            android:focusable="true" />
+            android:contentDescription="@string/navigate_up"
+            android:focusable="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_arrow_back" />
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:text="Add Medicine"
+            android:text="@string/add_medicine"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginStart="12dp" />
-
+            android:textStyle="bold" />
     </LinearLayout>
 
     <ScrollView
@@ -50,14 +50,83 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Medicine Name -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_auth_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="14dp">
+
+                <FrameLayout
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/bg_med_image_placeholder">
+
+                    <ImageView
+                        android:id="@+id/ivMedicineImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/medicine_image"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvMedicineImageFallback"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="💊"
+                        android:textSize="22sp"
+                        android:textColor="@color/navy" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/medicine_photo"
+                        android:textColor="@color/navy"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvMedicineImageStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/optional"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnPickImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_outline_button"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/add_photo"
+                    android:textColor="@color/navy"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilName"
                 style="@style/InputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Medicine Name *"
-                android:layout_marginBottom="14dp">
+                android:layout_marginBottom="14dp"
+                android:hint="@string/medicine_name_required">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etName"
                     android:layout_width="match_parent"
@@ -67,14 +136,14 @@
                     android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Category -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilCategory"
                 style="@style/InputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Category *"
-                android:layout_marginBottom="14dp">
+                android:layout_marginBottom="14dp"
+                android:hint="@string/category_required">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etCategory"
                     android:layout_width="match_parent"
@@ -84,14 +153,14 @@
                     android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Manufacturer -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilManufacturer"
                 style="@style/InputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Manufacturer"
-                android:layout_marginBottom="14dp">
+                android:layout_marginBottom="14dp"
+                android:hint="@string/manufacturer_optional">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etManufacturer"
                     android:layout_width="match_parent"
@@ -101,22 +170,22 @@
                     android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Price & Stock Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
                 android:orientation="horizontal"
-                android:weightSum="2"
-                android:layout_marginBottom="14dp">
+                android:weightSum="2">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilPrice"
                     style="@style/InputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:hint="Price (Rs) *"
-                    android:layout_marginEnd="7dp">
+                    android:hint="@string/price_rs_required">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPrice"
                         android:layout_width="match_parent"
@@ -131,9 +200,10 @@
                     style="@style/InputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:hint="Stock Qty *"
-                    android:layout_marginStart="7dp">
+                    android:hint="@string/stock_qty_required">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etStock"
                         android:layout_width="match_parent"
@@ -142,34 +212,32 @@
                         android:maxLines="1"
                         android:textColor="@color/black" />
                 </com.google.android.material.textfield.TextInputLayout>
-
             </LinearLayout>
 
-            <!-- Unit Spinner -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Unit"
+                android:layout_marginBottom="6dp"
+                android:text="@string/unit_label"
                 android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:layout_marginBottom="6dp" />
+                android:textSize="13sp" />
 
             <Spinner
                 android:id="@+id/spinnerUnit"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:background="@drawable/bg_spinner"
                 android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_spinner"
                 android:paddingHorizontal="12dp" />
 
-            <!-- Min Stock -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilMinStock"
                 style="@style/InputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Min Stock Alert Threshold"
-                android:layout_marginBottom="14dp">
+                android:layout_marginBottom="14dp"
+                android:hint="@string/min_stock_threshold">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etMinStock"
                     android:layout_width="match_parent"
@@ -180,42 +248,37 @@
                     android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Expiry Date Picker -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Expiry Date *"
+                android:layout_marginBottom="6dp"
+                android:text="@string/expiry_required"
                 android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:layout_marginBottom="6dp" />
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/tvExpiry"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="Tap to select date"
-                android:textColor="@color/text_hint"
+                android:layout_marginBottom="28dp"
                 android:background="@drawable/bg_spinner"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="16dp"
-                android:layout_marginBottom="28dp"
-                android:clickable="true"
-                android:focusable="true" />
+                android:text="@string/tap_select_date"
+                android:textColor="@color/text_hint" />
 
-            <!-- Save Button -->
             <Button
                 android:id="@+id/btnSave"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
-                android:text="Save Medicine"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
                 android:background="@drawable/bg_green_button"
-                style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
-
+                android:text="@string/save_medicine"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
-
     </ScrollView>
-
 </LinearLayout>

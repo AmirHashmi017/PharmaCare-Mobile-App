@@ -9,5 +9,6 @@ data class Medicine(
     val unit: String,
     val expiryDate: String,
     val manufacturer: String,
-    val minStock: Int = 10
+    val minStock: Int = 10,
+    val imageUri: String? = null
 )

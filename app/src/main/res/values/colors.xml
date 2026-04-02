@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="navy">#0D1B3E</color>
-    <color name="navy_mid">#152347</color>
-    <color name="navy_card">#1E2F5A</color>
-    <color name="green_primary">#27A85F</color>
-    <color name="green_dark">#1D8B4C</color>
-    <color name="green_light">#E8F7EF</color>
-    <color name="gold">#F5A623</color>
-    <color name="surface">#F0F3FA</color>
+    <!-- Deep slate headers / text (healthcare trust) -->
+    <color name="navy">#0F172A</color>
+    <color name="navy_mid">#1E293B</color>
+    <color name="navy_card">#334155</color>
+
+    <!-- Primary: clinical teal -->
+    <color name="green_primary">#0D9488</color>
+    <color name="green_dark">#0F766E</color>
+    <color name="green_light">#CCFBF1</color>
+
+    <color name="accent_blue">#0284C7</color>
+    <color name="gold">#F59E0B</color>
+
+    <color name="surface">#F8FAFC</color>
+    <color name="surface_elevated">#FFFFFF</color>
     <color name="white">#FFFFFF</color>
-    <color name="text_hint">#9DAAC2</color>
-    <color name="text_secondary">#6B7B9A</color>
-    <color name="border">#E2E8F5</color>
-    <color name="error">#E5534B</color>
-    <color name="black">#000000</color>
+
+    <color name="text_hint">#94A3B8</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_on_header_muted">#94A3B8</color>
+    <color name="border">#E2E8F0</color>
+    <color name="error">#DC2626</color>
+    <!-- On-light surfaces; inputs -->
+    <color name="black">#0F172A</color>
 </resources>

@@ -2,6 +2,7 @@ package com.example.mediquick
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -20,21 +21,22 @@ class MainActivity : AppCompatActivity() {
         val userName = account?.getString("name") ?: "Pharmacist"
 
         findViewById<TextView>(R.id.tvPharmacyName).text = pharmacyName
-        findViewById<TextView>(R.id.tvUserName).text = "Hi, $userName 👋"
+        findViewById<TextView>(R.id.tvUserName).text =
+            getString(R.string.dashboard_greeting, userName)
 
         refreshStats()
 
 
-        findViewById<androidx.cardview.widget.CardView>(R.id.cardInventory).setOnClickListener {
+        findViewById<View>(R.id.cardInventory).setOnClickListener {
             startActivity(Intent(this, InventoryActivity::class.java))
         }
-        findViewById<androidx.cardview.widget.CardView>(R.id.cardBilling).setOnClickListener {
+        findViewById<View>(R.id.cardBilling).setOnClickListener {
             startActivity(Intent(this, BillingActivity::class.java))
         }
-        findViewById<androidx.cardview.widget.CardView>(R.id.cardHistory).setOnClickListener {
+        findViewById<View>(R.id.cardHistory).setOnClickListener {
             startActivity(Intent(this, SalesHistoryActivity::class.java))
         }
-        findViewById<androidx.cardview.widget.CardView>(R.id.cardAlerts).setOnClickListener {
+        findViewById<View>(R.id.cardAlerts).setOnClickListener {
             startActivity(Intent(this, LowStockActivity::class.java))
         }
 

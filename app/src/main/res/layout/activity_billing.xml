@@ -3,166 +3,162 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/surface">
+    android:background="@color/surface"
+    android:orientation="vertical">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/navy"
-        android:paddingTop="48dp"
-        android:paddingBottom="16dp"
-        android:paddingHorizontal="20dp"
+        android:background="@drawable/bg_header_gradient"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="16dp">
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@android:drawable/ic_media_previous"
-            android:tint="@color/white"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
-            android:focusable="true" />
+            android:contentDescription="@string/navigate_up"
+            android:focusable="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_arrow_back" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:text="Billing &amp; Cart"
+            android:text="@string/title_billing"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginStart="12dp" />
-
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Two-pane: top = medicine search, bottom = cart -->
-    <!-- Medicine Search Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="16dp">
 
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:hint="Search &amp; add medicines..."
-            android:textColorHint="@color/text_hint"
-            android:textColor="@color/navy"
+            android:layout_height="48dp"
             android:background="@drawable/bg_search_white"
-            android:paddingHorizontal="16dp"
+            android:hint="@string/search_add_medicines_hint"
             android:inputType="text"
+            android:paddingHorizontal="16dp"
             android:singleLine="true"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@color/navy"
+            android:textColorHint="@color/text_hint" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvMedicines"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="12dp"
             android:clipToPadding="false" />
-
     </LinearLayout>
 
-    <!-- Divider -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="1dp"
         android:background="@color/border" />
 
-    <!-- Cart Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@color/surface_elevated"
+        android:elevation="4dp"
         android:orientation="vertical"
-        android:background="@color/white">
+        android:paddingTop="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:padding="12dp">
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="8dp">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="🛒 Cart"
+                android:text="@string/cart_label"
                 android:textColor="@color/navy"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvCartCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 item(s)"
+                android:text="@string/cart_items_zero"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
-
         </LinearLayout>
 
-        <!-- Customer name -->
         <EditText
             android:id="@+id/etCustomer"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:hint="Customer name (optional)"
-            android:textColorHint="@color/text_hint"
-            android:textColor="@color/navy"
+            android:layout_height="44dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/bg_search_white"
-            android:paddingHorizontal="16dp"
+            android:hint="@string/customer_optional"
             android:inputType="textPersonName"
+            android:paddingHorizontal="16dp"
             android:singleLine="true"
-            android:layout_marginHorizontal="12dp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@color/navy"
+            android:textColorHint="@color/text_hint" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvCart"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="8dp"
-            android:clipToPadding="false" />
+            android:clipToPadding="false"
+            android:paddingHorizontal="10dp"
+            android:paddingBottom="8dp" />
 
-        <!-- Total + Checkout -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:background="@drawable/bg_header_gradient"
             android:gravity="center_vertical"
-            android:padding="12dp"
-            android:background="@color/navy">
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp">
 
             <TextView
                 android:id="@+id/tvTotal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Total: Rs 0.00"
+                android:text="@string/total_placeholder"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnCheckout"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:text="Checkout →"
-                android:textColor="@color/white"
-                android:textStyle="bold"
+                android:layout_height="48dp"
                 android:background="@drawable/bg_green_button"
                 android:enabled="false"
-                style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
-
+                android:paddingHorizontal="20dp"
+                android:text="@string/checkout"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
         </LinearLayout>
-
     </LinearLayout>
-
 </LinearLayout>

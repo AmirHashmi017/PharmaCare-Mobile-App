@@ -3,19 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/surface">
+    android:background="@color/surface"
+    android:orientation="vertical">
 
-    <!-- Navy Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:background="@drawable/bg_header_gradient"
         android:gravity="center"
-        android:background="@color/navy"
-        android:paddingTop="56dp"
-        android:paddingBottom="40dp"
-        android:paddingHorizontal="28dp">
+        android:orientation="vertical"
+        android:paddingHorizontal="28dp"
+        android:paddingTop="52dp"
+        android:paddingBottom="36dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -25,32 +24,29 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medi"
+                android:text="Pharma"
                 android:textColor="@color/white"
-                android:textSize="28sp"
+                android:textSize="30sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Quick"
-                android:textColor="@color/green_primary"
-                android:textSize="28sp"
+                android:text="Care"
+                android:textColor="@color/green_light"
+                android:textSize="30sp"
                 android:textStyle="bold" />
-
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Welcome back, pharmacist"
-            android:textColor="#99AABBCC"
-            android:textSize="13sp" />
-
+            android:layout_marginTop="8dp"
+            android:text="@string/welcome_back"
+            android:textColor="@color/text_on_header_muted"
+            android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- Card Form -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -61,33 +57,32 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            android:paddingTop="28dp"
+            android:paddingTop="24dp"
             android:paddingBottom="32dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:background="@drawable/bg_auth_card"
+                android:orientation="vertical"
                 android:padding="24dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sign In"
+                    android:layout_marginBottom="20dp"
+                    android:text="@string/sign_in"
                     android:textColor="@color/navy"
                     android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="20dp" />
+                    android:textStyle="bold" />
 
-                <!-- Phone Field -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilPhone"
                     style="@style/InputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone Number"
-                    android:layout_marginBottom="14dp">
+                    android:layout_marginBottom="14dp"
+                    android:hint="@string/phone_number">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPhone"
@@ -96,18 +91,16 @@
                         android:inputType="phone"
                         android:maxLines="1"
                         android:textColor="@color/black" />
-
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Password Field -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilPassword"
                     style="@style/InputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Password"
-                    app:passwordToggleEnabled="true"
-                    android:layout_marginBottom="24dp">
+                    android:layout_marginBottom="24dp"
+                    android:hint="@string/password"
+                    app:passwordToggleEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPassword"
@@ -116,55 +109,47 @@
                         android:inputType="textPassword"
                         android:maxLines="1"
                         android:textColor="@color/black" />
-
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Error text -->
                 <TextView
                     android:id="@+id/tvError"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
                     android:text=""
                     android:textColor="@color/error"
                     android:textSize="13sp"
-                    android:visibility="gone"
-                    android:layout_marginBottom="12dp" />
+                    android:visibility="gone" />
 
-                <!-- Sign In Button -->
                 <Button
                     android:id="@+id/btnSignIn"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
-                    android:text="Sign In"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
                     android:background="@drawable/bg_green_button"
-                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
+                    android:text="@string/sign_in"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
-                <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/border"
-                    android:layout_marginVertical="20dp" />
+                    android:layout_marginVertical="20dp"
+                    android:background="@color/border" />
 
-                <!-- Go to Sign Up -->
                 <TextView
                     android:id="@+id/tvGoSignUp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Don't have an account? Sign Up"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:text="@string/no_account"
                     android:textColor="@color/green_primary"
                     android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:clickable="true"
-                    android:focusable="true" />
-
+                    android:textStyle="bold" />
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

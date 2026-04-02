@@ -3,109 +3,105 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/surface">
+    android:background="@color/surface"
+    android:orientation="vertical">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/navy"
+        android:background="@drawable/bg_header_gradient"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
         android:paddingTop="48dp"
-        android:paddingBottom="16dp"
-        android:paddingHorizontal="20dp"
-        android:orientation="vertical">
+        android:paddingBottom="18dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/ivBack"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@android:drawable/ic_media_previous"
-                android:tint="@color/white"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
-                android:focusable="true" />
+                android:contentDescription="@string/navigate_up"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_back" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
-                android:text="Medicine Inventory"
+                android:text="@string/title_inventory"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginStart="12dp" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 medicines"
-                android:textColor="@color/text_hint"
+                android:text="0"
+                android:textColor="@color/text_on_header_muted"
                 android:textSize="12sp" />
-
         </LinearLayout>
 
-        <!-- Search -->
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="12dp"
-            android:hint="Search medicines..."
-            android:textColorHint="@color/text_hint"
-            android:textColor="@color/white"
+            android:layout_height="48dp"
+            android:layout_marginTop="14dp"
             android:background="@drawable/bg_search_field"
-            android:paddingHorizontal="16dp"
-            android:inputType="text"
+            android:hint="@string/search_medicines_hint"
             android:imeOptions="actionSearch"
-            android:singleLine="true" />
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="@color/text_on_header_muted" />
 
-        <!-- Category Spinner -->
         <Spinner
             android:id="@+id/spinnerCategory"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="8dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/bg_search_field"
             android:paddingHorizontal="8dp" />
-
     </LinearLayout>
 
-    <!-- List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMedicines"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="12dp"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:padding="16dp" />
 
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="No medicines found.\nTap + to add one."
         android:gravity="center"
+        android:lineSpacingExtra="6dp"
+        android:text="@string/inventory_empty"
         android:textColor="@color/text_secondary"
         android:textSize="15sp"
-        android:lineSpacingExtra="6dp"
         android:visibility="gone" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
+        android:layout_gravity="end"
         android:layout_margin="20dp"
-        android:src="@android:drawable/ic_input_add"
+        android:contentDescription="@string/add_medicine"
+        android:src="@drawable/ic_add_fab"
         app:backgroundTint="@color/green_primary"
         app:tint="@color/white" />
-
 </LinearLayout>
