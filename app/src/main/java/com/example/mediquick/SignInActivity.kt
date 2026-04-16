@@ -54,6 +54,7 @@ class SignInActivity : AppCompatActivity() {
 
                 // --- Local broadcast: signed-in event ---
                 sendBroadcast(Intent(AuthBroadcast.ACTION_SIGNED_IN).apply {
+                    setPackage(packageName)
                     putExtra(AuthBroadcast.EXTRA_USER_NAME, name)
                 })
 

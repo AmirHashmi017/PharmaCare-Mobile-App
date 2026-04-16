@@ -13,6 +13,7 @@ class NetworkReceiver : BroadcastReceiver() {
             ConnectivityManager.CONNECTIVITY_ACTION -> {
                 val status = getNetworkStatus(context)
                 val local = Intent(ACTION_NETWORK_CHANGED).apply {
+                    setPackage(context.packageName)   // ← add this
                     putExtra(EXTRA_IS_CONNECTED, status.isConnected)
                     putExtra(EXTRA_TYPE, status.type)
                 }
@@ -21,6 +22,7 @@ class NetworkReceiver : BroadcastReceiver() {
             Intent.ACTION_AIRPLANE_MODE_CHANGED -> {
                 val isOn = intent.getBooleanExtra("state", false)
                 val local = Intent(ACTION_AIRPLANE_MODE_CHANGED).apply {
+                    setPackage(context.packageName)   // ← add this
                     putExtra(EXTRA_AIRPLANE_ON, isOn)
                 }
                 context.sendBroadcast(local)

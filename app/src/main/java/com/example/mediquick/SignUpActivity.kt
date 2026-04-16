@@ -68,6 +68,7 @@ class SignUpActivity : AppCompatActivity() {
 
             // --- Local broadcast: signed-up event ---
             sendBroadcast(Intent(AuthBroadcast.ACTION_SIGNED_UP).apply {
+                setPackage(packageName)
                 putExtra(AuthBroadcast.EXTRA_USER_NAME, name)
             })
 

@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -89,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvLogout).setOnClickListener {
             UserPrefs.setLoggedIn(this, false)
             // Local broadcast: signed-out event
-            sendBroadcast(Intent(AuthBroadcast.ACTION_SIGNED_OUT))
+            sendBroadcast(Intent(AuthBroadcast.ACTION_SIGNED_OUT).setPackage(packageName))
             startActivity(Intent(this, LandingActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
@@ -112,7 +113,10 @@ class MainActivity : AppCompatActivity() {
             addAction(NetworkReceiver.ACTION_NETWORK_CHANGED)
             addAction(NetworkReceiver.ACTION_AIRPLANE_MODE_CHANGED)
         }
-        registerReceiver(localNetworkReceiver, localNetFilter)
+        ContextCompat.registerReceiver(
+            this, localNetworkReceiver, localNetFilter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
 
         // ── Register local receiver for auth events ───────────────────────────
         val authFilter = IntentFilter().apply {
@@ -120,13 +124,14 @@ class MainActivity : AppCompatActivity() {
             addAction(AuthBroadcast.ACTION_SIGNED_UP)
             addAction(AuthBroadcast.ACTION_SIGNED_OUT)
         }
-        registerReceiver(authReceiver, authFilter)
+        ContextCompat.registerReceiver(
+            this, authReceiver, authFilter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
 
-        // Show current network state immediately on start
         val status = NetworkReceiver.getNetworkStatus(this)
         updateNetworkBanner(status.isConnected, status.type)
     }
-
     override fun onStop() {
         super.onStop()
         unregisterReceiver(networkReceiver)
