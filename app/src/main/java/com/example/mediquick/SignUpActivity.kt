@@ -1,4 +1,3 @@
-
 package com.example.mediquick
 
 import android.content.Intent
@@ -15,7 +14,6 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         if (UserPrefs.hasAccount(this)) {
             Toast.makeText(this, "Account already exists on this device.", Toast.LENGTH_SHORT).show()
@@ -46,8 +44,7 @@ class SignUpActivity : AppCompatActivity() {
 
         fun clearErrors() {
             tvError.visibility = View.GONE
-            listOf(tilName, tilPharmacy, tilPhone, tilPassword, tilConfirm)
-                .forEach { it.error = null }
+            listOf(tilName, tilPharmacy, tilPhone, tilPassword, tilConfirm).forEach { it.error = null }
         }
 
         findViewById<Button>(R.id.btnSignUp).setOnClickListener {
@@ -58,17 +55,21 @@ class SignUpActivity : AppCompatActivity() {
             val password = etPassword.text.toString()
             val confirm  = etConfirm.text.toString()
 
-
             when {
-                name.isEmpty()     -> { tilName.error = "Enter your full name"; return@setOnClickListener }
-                pharmacy.isEmpty() -> { tilPharmacy.error = "Enter pharmacy name"; return@setOnClickListener }
-                phone.length < 10  -> { tilPhone.error = "Enter a valid phone number"; return@setOnClickListener }
+                name.isEmpty()      -> { tilName.error = "Enter your full name";                return@setOnClickListener }
+                pharmacy.isEmpty()  -> { tilPharmacy.error = "Enter pharmacy name";             return@setOnClickListener }
+                phone.length < 10   -> { tilPhone.error = "Enter a valid phone number";         return@setOnClickListener }
                 password.length < 6 -> { tilPassword.error = "Password must be at least 6 characters"; return@setOnClickListener }
-                password != confirm -> { tilConfirm.error = "Passwords do not match"; return@setOnClickListener }
+                password != confirm -> { tilConfirm.error = "Passwords do not match";           return@setOnClickListener }
             }
 
             UserPrefs.saveAccount(this, name, pharmacy, phone, password)
             UserPrefs.setLoggedIn(this, true)
+
+            // --- Local broadcast: signed-up event ---
+            sendBroadcast(Intent(AuthBroadcast.ACTION_SIGNED_UP).apply {
+                putExtra(AuthBroadcast.EXTRA_USER_NAME, name)
+            })
 
             Toast.makeText(this, "Welcome to MediQuick, $name! 🎉", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, MainActivity::class.java).apply {

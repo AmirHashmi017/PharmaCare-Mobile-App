@@ -1,4 +1,3 @@
-
 package com.example.mediquick
 
 import android.content.Intent
@@ -17,10 +16,10 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
 
-        val etPhone    = findViewById<TextInputEditText>(R.id.etPhone)
-        val etPassword = findViewById<TextInputEditText>(R.id.etPassword)
-        val tvError    = findViewById<TextView>(R.id.tvError)
-        val tilPhone   = findViewById<TextInputLayout>(R.id.tilPhone)
+        val etPhone     = findViewById<TextInputEditText>(R.id.etPhone)
+        val etPassword  = findViewById<TextInputEditText>(R.id.etPassword)
+        val tvError     = findViewById<TextView>(R.id.tvError)
+        val tilPhone    = findViewById<TextInputLayout>(R.id.tilPhone)
         val tilPassword = findViewById<TextInputLayout>(R.id.tilPassword)
 
         fun showError(msg: String) {
@@ -30,7 +29,7 @@ class SignInActivity : AppCompatActivity() {
 
         fun clearErrors() {
             tvError.visibility = View.GONE
-            tilPhone.error = null
+            tilPhone.error    = null
             tilPassword.error = null
         }
 
@@ -41,7 +40,7 @@ class SignInActivity : AppCompatActivity() {
 
             when {
                 phone.isEmpty()    -> { tilPhone.error = "Enter phone number"; return@setOnClickListener }
-                password.isEmpty() -> { tilPassword.error = "Enter password"; return@setOnClickListener }
+                password.isEmpty() -> { tilPassword.error = "Enter password";  return@setOnClickListener }
             }
 
             if (!UserPrefs.hasAccount(this)) {
@@ -52,6 +51,12 @@ class SignInActivity : AppCompatActivity() {
             if (UserPrefs.validate(this, phone, password)) {
                 UserPrefs.setLoggedIn(this, true)
                 val name = UserPrefs.getAccount(this)?.getString("name") ?: "Pharmacist"
+
+                // --- Local broadcast: signed-in event ---
+                sendBroadcast(Intent(AuthBroadcast.ACTION_SIGNED_IN).apply {
+                    putExtra(AuthBroadcast.EXTRA_USER_NAME, name)
+                })
+
                 Toast.makeText(this, "Welcome back, $name!", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -60,7 +65,6 @@ class SignInActivity : AppCompatActivity() {
                 showError("Incorrect phone number or password.")
             }
         }
-
 
         val tvGoSignUp = findViewById<TextView>(R.id.tvGoSignUp)
         if (UserPrefs.hasAccount(this)) {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Reusable chip cell used in all three GridViews:
+    • Inventory  → quick-filter category chips
+    • Billing    → browse-by-type chips
+    • Low Stock  → action hint chips
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tvChip"
+    android:layout_width="match_parent"
+    android:layout_height="36dp"
+    android:background="@drawable/bg_navy_card"
+    android:gravity="center"
+    android:maxLines="1"
+    android:ellipsize="end"
+    android:paddingHorizontal="8dp"
+    android:textColor="@color/white"
+    android:textSize="11sp"
+    android:textStyle="bold" />

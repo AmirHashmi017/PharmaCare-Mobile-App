@@ -6,6 +6,7 @@
     android:background="@color/surface"
     android:orientation="vertical">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,6 +44,7 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Alert count banner -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,6 +71,28 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
+        <!-- GridView: static action hints — What you can do here -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="6dp"
+            android:text="ACTIONS"
+            android:textColor="@color/text_on_header_muted"
+            android:textSize="10sp"
+            android:letterSpacing="0.12"
+            android:textStyle="bold" />
+
+        <GridView
+            android:id="@+id/gridActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="3"
+            android:horizontalSpacing="8dp"
+            android:verticalSpacing="6dp"
+            android:stretchMode="columnWidth"
+            android:listSelector="@android:color/transparent" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
