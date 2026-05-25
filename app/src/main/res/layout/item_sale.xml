@@ -17,7 +17,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Top row: Sale ID + Total -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,7 +33,7 @@
                     android:id="@+id/tvSaleId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sale #1"
+                    android:text="Order #1"
                     android:textColor="@color/navy"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -43,10 +42,20 @@
                     android:id="@+id/tvSaleCustomer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Walk-in Customer"
+                    android:text="Customer Name"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp" />
+
+                <TextView
+                    android:id="@+id/tvSaleStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status: PAYMENT_PENDING"
+                    android:textColor="@color/navy"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="4dp" />
 
             </LinearLayout>
 
@@ -78,7 +87,16 @@
 
         </LinearLayout>
 
-        <!-- Expandable items list -->
+        <Button
+            android:id="@+id/btnAction"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="Update Status"
+            android:textColor="@color/green_primary"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/tvSaleItems"
             android:layout_width="match_parent"

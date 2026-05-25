@@ -1,7 +1,11 @@
 package com.example.mediquick
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "medicines")
 data class Medicine(
-    val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val category: String,
     val price: Double,
@@ -10,5 +14,12 @@ data class Medicine(
     val expiryDate: String,
     val manufacturer: String,
     val minStock: Int = 10,
-    val imageUri: String? = null
+    val imageUri: String? = null,
+    val addedBy: String? = null, // Track pharmacist/accountant
+    val lastUpdatedBy: String? = null
 )
+
+object MedicineConstants {
+    val CATEGORIES = listOf("Analgesic", "Antibiotic", "Rehydration", "Antacid", "Antihistamine", "Anti-inflammatory", "Antidiabetic", "Vitamins", "Others")
+    val UNITS = listOf("tablets", "capsules", "sachets", "bottles", "strips", "pcs") // Removed mg and ml as requested
+}

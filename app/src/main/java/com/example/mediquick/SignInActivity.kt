@@ -7,74 +7,92 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class SignInActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var db: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
 
-        val etPhone     = findViewById<TextInputEditText>(R.id.etPhone)
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+        db = AppDatabase.getDatabase(this)
+
+        val etEmail     = findViewById<TextInputEditText>(R.id.etEmail)
         val etPassword  = findViewById<TextInputEditText>(R.id.etPassword)
         val tvError     = findViewById<TextView>(R.id.tvError)
-        val tilPhone    = findViewById<TextInputLayout>(R.id.tilPhone)
-        val tilPassword = findViewById<TextInputLayout>(R.id.tilPassword)
-
-        fun showError(msg: String) {
-            tvError.text = msg
-            tvError.visibility = View.VISIBLE
-        }
-
-        fun clearErrors() {
-            tvError.visibility = View.GONE
-            tilPhone.error    = null
-            tilPassword.error = null
-        }
 
         findViewById<Button>(R.id.btnSignIn).setOnClickListener {
-            clearErrors()
-            val phone    = etPhone.text.toString().trim()
+            val email    = etEmail.text.toString().trim()
             val password = etPassword.text.toString()
 
-            when {
-                phone.isEmpty()    -> { tilPhone.error = "Enter phone number"; return@setOnClickListener }
-                password.isEmpty() -> { tilPassword.error = "Enter password";  return@setOnClickListener }
-            }
-
-            if (!UserPrefs.hasAccount(this)) {
-                showError("No account found on this device. Please sign up first.")
+            if (email == "admin@gmail.com" && password == "Admin123") {
+                loginAsAdmin()
                 return@setOnClickListener
             }
 
-            if (UserPrefs.validate(this, phone, password)) {
-                UserPrefs.setLoggedIn(this, true)
-                val name = UserPrefs.getAccount(this)?.getString("name") ?: "Pharmacist"
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-                // --- Local broadcast: signed-in event ---
-                sendBroadcast(Intent(AuthBroadcast.ACTION_SIGNED_IN).apply {
-                    setPackage(packageName)
-                    putExtra(AuthBroadcast.EXTRA_USER_NAME, name)
-                })
-
-                Toast.makeText(this, "Welcome back, $name!", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
-            } else {
-                showError("Incorrect phone number or password.")
+            lifecycleScope.launch {
+                try {
+                    val result = auth.signInWithEmailAndPassword(email, password).await()
+                    val uid = result.user?.uid ?: return@launch
+                    
+                    val doc = firestore.collection("users").document(uid).get().await()
+                    val user = doc.toObject(User::class.java)
+                    
+                    if (user != null) {
+                        db.userDao().insertUser(user)
+                        UserPrefs.setLoggedIn(this@SignInActivity, true)
+                        navigateToMain(user.name)
+                    } else {
+                        tvError.text = "User data not found"
+                        tvError.visibility = View.VISIBLE
+                    }
+                } catch (e: Exception) {
+                    tvError.text = e.message
+                    tvError.visibility = View.VISIBLE
+                }
             }
         }
 
-        val tvGoSignUp = findViewById<TextView>(R.id.tvGoSignUp)
-        if (UserPrefs.hasAccount(this)) {
-            tvGoSignUp.visibility = View.GONE
-        } else {
-            tvGoSignUp.setOnClickListener {
-                startActivity(Intent(this, SignUpActivity::class.java))
-                finish()
-            }
+        findViewById<TextView>(R.id.tvGoSignUp).setOnClickListener {
+            startActivity(Intent(this, SignUpActivity::class.java))
+            finish()
         }
+    }
+
+    private fun loginAsAdmin() {
+        val adminUser = User(
+            uid = "ADMIN_ID",
+            name = "System Admin",
+            email = "admin@gmail.com",
+            role = UserRole.ADMIN
+        )
+        lifecycleScope.launch {
+            db.userDao().insertUser(adminUser)
+            UserPrefs.setLoggedIn(this@SignInActivity, true)
+            navigateToMain("Admin")
+        }
+    }
+
+    private fun navigateToMain(name: String) {
+        Toast.makeText(this, "Welcome, $name!", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
     }
 }

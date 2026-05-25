@@ -18,57 +18,46 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingHorizontal="28dp"
-            android:paddingTop="56dp"
-            android:paddingBottom="40dp">
+            android:paddingTop="80dp"
+            android:paddingBottom="60dp">
 
             <androidx.cardview.widget.CardView
-                android:layout_width="88dp"
-                android:layout_height="88dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="6dp">
+                app:cardCornerRadius="30dp"
+                app:cardElevation="8dp">
 
                 <ImageView
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_inventory"
                     app:tint="@color/green_primary" />
             </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:letterSpacing="0.14"
-                android:text="@string/tagline"
-                android:textAllCaps="true"
-                android:textColor="@color/green_light"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="32dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pharma"
+                    android:text="Medi"
                     android:textColor="@color/white"
-                    android:textSize="38sp"
+                    android:textSize="42sp"
                     android:fontFamily="sans-serif-medium"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Care"
+                    android:text="Quick"
                     android:textColor="@color/green_light"
-                    android:textSize="38sp"
+                    android:textSize="42sp"
                     android:fontFamily="sans-serif-medium"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -76,21 +65,21 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
                 android:lineSpacingExtra="4dp"
-                android:text="@string/subtitle"
+                android:text="Your Comprehensive Pharmacy &amp; Medicine Companion"
                 android:textColor="@color/text_on_header_muted"
-                android:textSize="15sp" />
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/btnGetStarted"
                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="36dp"
+                android:layout_marginTop="48dp"
                 android:background="@drawable/bg_green_button"
-                android:text="@string/get_started"
+                android:text="GET STARTED"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -100,9 +89,9 @@
                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/bg_outline_button"
-                android:text="@string/sign_in"
+                android:text="SIGN IN"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -114,17 +103,17 @@
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
             android:paddingTop="28dp"
-            android:paddingBottom="32dp">
+            android:paddingBottom="40dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 android:gravity="center"
                 android:letterSpacing="0.12"
-                android:text="@string/landing_features_heading"
+                android:text="KEY FEATURES"
                 android:textColor="@color/text_secondary"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -141,28 +130,27 @@
                     android:layout_weight="1"
                     android:background="@drawable/bg_feature_card"
                     android:orientation="vertical"
-                    android:padding="18dp">
+                    android:padding="20dp">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="12dp"
                         android:src="@drawable/ic_inventory" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/feature_inventory"
+                        android:text="Inventory"
                         android:textColor="@color/navy"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:lineSpacingExtra="2dp"
-                        android:text="@string/feature_inventory_sub"
+                        android:layout_marginTop="6dp"
+                        android:text="Manage stocks seamlessly"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -174,28 +162,27 @@
                     android:layout_weight="1"
                     android:background="@drawable/bg_feature_card"
                     android:orientation="vertical"
-                    android:padding="18dp">
+                    android:padding="20dp">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="12dp"
                         android:src="@drawable/ic_billing" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/feature_billing"
+                        android:text="Billing"
                         android:textColor="@color/navy"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:lineSpacingExtra="2dp"
-                        android:text="@string/feature_billing_sub"
+                        android:layout_marginTop="6dp"
+                        android:text="Fast and accurate checkout"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -204,7 +191,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
@@ -215,27 +201,27 @@
                     android:layout_weight="1"
                     android:background="@drawable/bg_feature_card"
                     android:orientation="vertical"
-                    android:padding="18dp">
+                    android:padding="20dp">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="12dp"
                         android:src="@drawable/ic_history" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/feature_sales"
+                        android:text="Orders"
                         android:textColor="@color/navy"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/feature_sales_sub"
+                        android:layout_marginTop="6dp"
+                        android:text="Track all transactions"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -247,81 +233,30 @@
                     android:layout_weight="1"
                     android:background="@drawable/bg_feature_card"
                     android:orientation="vertical"
-                    android:padding="18dp">
+                    android:padding="20dp">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="12dp"
                         android:src="@drawable/ic_alert" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/feature_alerts"
+                        android:text="Alerts"
                         android:textColor="@color/navy"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/feature_alerts_sub"
+                        android:layout_marginTop="6dp"
+                        android:text="Low stock notifications"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_offline_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="18dp">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_inventory"
-                    app:tint="@color/green_primary" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/offline_badge"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/offline_sub"
-                        android:textColor="@color/text_on_header_muted"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_version_pill"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:text="@string/version"
-                    android:textColor="@color/white"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

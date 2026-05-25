@@ -1,74 +1,151 @@
 package com.example.mediquick
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var db: DatabaseHelper
-
-    // ── System broadcast receiver (network + airplane mode) ──────────────────
-    private val networkReceiver = NetworkReceiver()
-
-    // ── Local receiver that listens to the app-local network-changed action ──
-    private val localNetworkReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                NetworkReceiver.ACTION_NETWORK_CHANGED -> {
-                    val connected = intent.getBooleanExtra(NetworkReceiver.EXTRA_IS_CONNECTED, false)
-                    val type      = intent.getStringExtra(NetworkReceiver.EXTRA_TYPE) ?: "None"
-                    val msg = if (connected) "📶 Connected via $type" else "⚠️ No internet connection"
-                    Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
-                    updateNetworkBanner(connected, type)
-                }
-                NetworkReceiver.ACTION_AIRPLANE_MODE_CHANGED -> {
-                    val on = intent.getBooleanExtra(NetworkReceiver.EXTRA_AIRPLANE_ON, false)
-                    val msg = if (on) "✈️ Airplane mode ON — offline only" else "✈️ Airplane mode OFF"
-                    Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
-                    updateNetworkBanner(!on, if (on) "Airplane Mode" else "Reconnecting…")
-                }
-            }
-        }
-    }
-
-    // ── Local receiver for auth events ────────────────────────────────────────
-    private val authReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val name = intent.getStringExtra(AuthBroadcast.EXTRA_USER_NAME) ?: return
-            when (intent.action) {
-                AuthBroadcast.ACTION_SIGNED_IN  -> Toast.makeText(context, "✅ Signed in as $name", Toast.LENGTH_SHORT).show()
-                AuthBroadcast.ACTION_SIGNED_UP  -> Toast.makeText(context, "🎉 Account created for $name", Toast.LENGTH_SHORT).show()
-                AuthBroadcast.ACTION_SIGNED_OUT -> Toast.makeText(context, "👋 Signed out", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+    private lateinit var db: AppDatabase
+    private lateinit var auth: FirebaseAuth
+    private var currentUser: User? = null
+    private var selectedTimeFilter = "Today"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        db = DatabaseHelper(this)
+        
+        db = AppDatabase.getDatabase(this)
+        auth = FirebaseAuth.getInstance()
 
-        val account      = UserPrefs.getAccount(this)
-        val pharmacyName = account?.getString("pharmacy") ?: "My Pharmacy"
-        val userName     = account?.getString("name") ?: "Pharmacist"
+        loadUserData()
 
-        findViewById<TextView>(R.id.tvPharmacyName).text = pharmacyName
-        findViewById<TextView>(R.id.tvUserName).text =
-            getString(R.string.dashboard_greeting, userName)
+        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
+            val user = currentUser
+            if (user?.role == UserRole.PHARMACIST) {
+                startActivity(Intent(this, AddEditMedicineActivity::class.java))
+            }
+        }
 
-        refreshStats()
+        findViewById<View>(R.id.cardAddPharmacist).setOnClickListener {
+            startActivity(Intent(this, AddPharmacistActivity::class.java))
+        }
 
-        // ── Nav cards ────────────────────────────────────────────────────────
+        findViewById<TextView>(R.id.tvLogout).setOnClickListener {
+            auth.signOut()
+            lifecycleScope.launch {
+                db.userDao().clearUsers()
+                UserPrefs.setLoggedIn(this@MainActivity, false)
+                startActivity(Intent(this@MainActivity, LandingActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }
+        }
+
+        val spinnerFilter = findViewById<Spinner>(R.id.spinnerTimeFilter)
+        val filters = arrayOf("Today", "Last Week", "Last Month")
+        spinnerFilter.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, filters)
+        spinnerFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedTimeFilter = filters[position]
+                refreshStats()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        setupNavigation()
+    }
+
+    private fun loadUserData() {
+        lifecycleScope.launch {
+            var user: User? = db.userDao().getUserById("ADMIN_ID")
+            if (user == null) {
+                val uid = auth.currentUser?.uid
+                if (uid != null) {
+                    user = db.userDao().getUserById(uid)
+                }
+            }
+
+            if (user == null) {
+                startActivity(Intent(this@MainActivity, SignInActivity::class.java))
+                finish()
+                return@launch
+            }
+            
+            currentUser = user
+            updateUI()
+            refreshStats()
+        }
+    }
+
+    private fun updateUI() {
+        val user = currentUser ?: return
+        findViewById<TextView>(R.id.tvPharmacyName).text = "MediQuick"
+        
+        val roleDisplay = when(user.role) {
+            UserRole.ADMIN -> "System Administrator"
+            UserRole.PHARMACIST -> "Pharmacist"
+            UserRole.USER -> "Customer"
+        }
+        findViewById<TextView>(R.id.tvUserName).text = "$roleDisplay: ${user.name}"
+
+        val cardInventory = findViewById<View>(R.id.cardInventory)
+        val cardBilling = findViewById<View>(R.id.cardBilling)
+        val cardHistory = findViewById<View>(R.id.cardHistory)
+        val cardAlerts = findViewById<View>(R.id.cardAlerts)
+        val cardAddPharmacist = findViewById<View>(R.id.cardAddPharmacist)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        
+        val tvHistoryTitle = findViewById<TextView>(R.id.tvHistoryTitle)
+        val tvBillingTitle = findViewById<TextView>(R.id.tvBillingTitle)
+
+        // Reset visibility
+        cardInventory.visibility = View.VISIBLE
+        cardBilling.visibility = View.VISIBLE
+        cardHistory.visibility = View.VISIBLE
+        cardAlerts.visibility = View.VISIBLE
+        cardAddPharmacist.visibility = View.GONE
+        findViewById<View>(R.id.statCardRevenue).visibility = View.VISIBLE
+        findViewById<View>(R.id.statCardLowStock).visibility = View.VISIBLE
+        findViewById<View>(R.id.filterLayout).visibility = View.VISIBLE
+
+        when (user.role) {
+            UserRole.ADMIN -> {
+                cardBilling.visibility = View.GONE
+                cardAddPharmacist.visibility = View.VISIBLE
+                fab.visibility = View.GONE
+                tvHistoryTitle.text = "Sales History"
+            }
+            UserRole.PHARMACIST -> {
+                cardAddPharmacist.visibility = View.GONE
+                fab.visibility = View.VISIBLE
+                tvHistoryTitle.text = "Sales History"
+                tvBillingTitle.text = "Create Sale"
+            }
+            UserRole.USER -> {
+                cardInventory.visibility = View.GONE
+                cardAlerts.visibility = View.GONE
+                fab.visibility = View.GONE
+                tvHistoryTitle.text = "My Purchase History"
+                tvBillingTitle.text = "Order Medicines"
+                
+                findViewById<View>(R.id.statCardRevenue).visibility = View.GONE
+                findViewById<View>(R.id.statCardLowStock).visibility = View.GONE
+                findViewById<View>(R.id.filterLayout).visibility = View.GONE
+            }
+        }
+    }
+
+    private fun setupNavigation() {
         findViewById<View>(R.id.cardInventory).setOnClickListener {
             startActivity(Intent(this, InventoryActivity::class.java))
         }
@@ -81,86 +158,54 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.cardAlerts).setOnClickListener {
             startActivity(Intent(this, LowStockActivity::class.java))
         }
+    }
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            startActivity(Intent(this, AddEditMedicineActivity::class.java))
-        }
+    private fun refreshStats() {
+        val user = currentUser ?: return
+        lifecycleScope.launch {
+            val totalMeds = db.medicineDao().getCount()
+            val lowStockItems = db.medicineDao().getLowStockMedicines().first()
+            
+            findViewById<TextView>(R.id.tvStatMedicines).text = totalMeds.toString()
+            findViewById<TextView>(R.id.tvStatLowStock).text = lowStockItems.size.toString()
 
-        // ── Logout ───────────────────────────────────────────────────────────
-        findViewById<TextView>(R.id.tvLogout).setOnClickListener {
-            UserPrefs.setLoggedIn(this, false)
-            // Local broadcast: signed-out event
-            sendBroadcast(Intent(AuthBroadcast.ACTION_SIGNED_OUT).setPackage(packageName))
-            startActivity(Intent(this, LandingActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            })
+            val statsVal = findViewById<TextView>(R.id.tvStatTotalSales)
+            val statsLabel = findViewById<TextView>(R.id.tvStatTotalSalesLabel)
+            val revenueVal = findViewById<TextView>(R.id.tvStatTodaySales)
+            
+            val startDate = getStartDate(selectedTimeFilter)
+
+            val salesFlow = when (user.role) {
+                UserRole.ADMIN -> db.saleDao().getSalesFromDate(startDate)
+                UserRole.PHARMACIST -> db.saleDao().getSalesFromDateByPharmacist(user.uid, startDate)
+                UserRole.USER -> db.saleDao().getSalesFromDateByCustomer(user.uid, startDate)
+            }
+            
+            val sales = salesFlow.first()
+            statsVal.text = sales.size.toString()
+            statsLabel.text = if (user.role == UserRole.USER) "My Orders" else "Total Orders"
+            
+            val completedRevenue = sales.filter { 
+                it.status == "COMPLETED" || it.status == "PAYMENT_DONE" || it.status == "IN_SHIPPING"
+            }.sumOf { it.total }
+            
+            val fmt = java.text.DecimalFormat("#,##0.00")
+            revenueVal.text = "Rs ${fmt.format(completedRevenue)}"
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        // ── Register system broadcast for network + airplane ─────────────────
-        val sysFilter = IntentFilter().apply {
-            @Suppress("DEPRECATION")
-            addAction(ConnectivityManager.CONNECTIVITY_ACTION)
-            addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
+    private fun getStartDate(filter: String): String {
+        val cal = Calendar.getInstance()
+        when (filter) {
+            "Today" -> {}
+            "Last Week" -> cal.add(Calendar.DAY_OF_YEAR, -7)
+            "Last Month" -> cal.add(Calendar.MONTH, -1)
         }
-        registerReceiver(networkReceiver, sysFilter)
-
-        // ── Register local receiver for the app-internal rebroadcast ─────────
-        val localNetFilter = IntentFilter().apply {
-            addAction(NetworkReceiver.ACTION_NETWORK_CHANGED)
-            addAction(NetworkReceiver.ACTION_AIRPLANE_MODE_CHANGED)
-        }
-        ContextCompat.registerReceiver(
-            this, localNetworkReceiver, localNetFilter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-
-        // ── Register local receiver for auth events ───────────────────────────
-        val authFilter = IntentFilter().apply {
-            addAction(AuthBroadcast.ACTION_SIGNED_IN)
-            addAction(AuthBroadcast.ACTION_SIGNED_UP)
-            addAction(AuthBroadcast.ACTION_SIGNED_OUT)
-        }
-        ContextCompat.registerReceiver(
-            this, authReceiver, authFilter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-
-        val status = NetworkReceiver.getNetworkStatus(this)
-        updateNetworkBanner(status.isConnected, status.type)
-    }
-    override fun onStop() {
-        super.onStop()
-        unregisterReceiver(networkReceiver)
-        unregisterReceiver(localNetworkReceiver)
-        unregisterReceiver(authReceiver)
+        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(cal.time)
     }
 
     override fun onResume() {
         super.onResume()
         refreshStats()
-    }
-
-    private fun refreshStats() {
-        val fmt = java.text.DecimalFormat("#,##0.00")
-        findViewById<TextView>(R.id.tvStatMedicines).text   = db.getTotalMedicines().toString()
-        findViewById<TextView>(R.id.tvStatLowStock).text    = db.getLowStockCount().toString()
-        findViewById<TextView>(R.id.tvStatTodaySales).text  = "Rs ${fmt.format(db.getTodaySalesTotal())}"
-        findViewById<TextView>(R.id.tvStatTotalSales).text  = db.getTotalSales().toString()
-    }
-
-    /** Shows/hides the network status banner at the top of the dashboard. */
-    private fun updateNetworkBanner(connected: Boolean, type: String) {
-        val banner  = findViewById<View>(R.id.networkBanner)   ?: return
-        val tvBanner = findViewById<TextView>(R.id.tvNetworkBanner) ?: return
-        if (!connected) {
-            tvBanner.text = "⚠️  No internet — running offline  ($type)"
-            banner.visibility = View.VISIBLE
-        } else {
-            banner.visibility = View.GONE
-        }
     }
 }

@@ -12,7 +12,6 @@ class DatabaseHelper(context: Context) :
         private const val DB_NAME    = "mediquick.db"
         private const val DB_VERSION = 2
 
-
         const val TBL_MED   = "medicines"
         const val COL_ID    = "id"
         const val COL_NAME  = "name"
@@ -25,12 +24,10 @@ class DatabaseHelper(context: Context) :
         const val COL_MIN   = "min_stock"
         const val COL_IMG   = "image_uri"
 
-
         const val TBL_SALE  = "sales"
         const val COL_CUST  = "customer_name"
         const val COL_DATE  = "date"
         const val COL_TOTAL = "total"
-
 
         const val TBL_ITEM  = "sale_items"
         const val COL_SID   = "sale_id"
@@ -76,9 +73,8 @@ class DatabaseHelper(context: Context) :
                 FOREIGN KEY($COL_SID) REFERENCES $TBL_SALE($COL_ID)
             )
         """.trimIndent())
-
-
-        seedSampleData(db)
+        
+        // Seed data removed as per request
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -86,32 +82,6 @@ class DatabaseHelper(context: Context) :
             db.execSQL("ALTER TABLE $TBL_MED ADD COLUMN $COL_IMG TEXT")
         }
     }
-
-    private fun seedSampleData(db: SQLiteDatabase) {
-        val samples = listOf(
-            arrayOf("Paracetamol 500mg", "Analgesic", 12.0, 150, "tablets", "2026-12-31", "PharmaCo", 20),
-            arrayOf("Amoxicillin 250mg", "Antibiotic", 35.0, 80, "capsules", "2025-09-30", "MediLabs", 15),
-            arrayOf("ORS Sachet", "Rehydration", 8.5, 200, "sachets", "2026-06-30", "Hydra Inc", 30),
-            arrayOf("Omeprazole 20mg", "Antacid", 28.0, 60, "capsules", "2025-11-30", "GastroPharma", 10),
-            arrayOf("Cetirizine 10mg", "Antihistamine", 15.0, 7, "tablets", "2026-03-31", "AllergyCare", 15),
-            arrayOf("Ibuprofen 400mg", "Anti-inflammatory", 18.0, 120, "tablets", "2026-08-31", "PainAway", 20),
-            arrayOf("Metformin 500mg", "Antidiabetic", 22.0, 4, "tablets", "2025-10-31", "DiabeCare", 10),
-        )
-        for (s in samples) {
-            val cv = ContentValues().apply {
-                put(COL_NAME, s[0] as String)
-                put(COL_CAT, s[1] as String)
-                put(COL_PRICE, s[2] as Double)
-                put(COL_STOCK, s[3] as Int)
-                put(COL_UNIT, s[4] as String)
-                put(COL_EXP, s[5] as String)
-                put(COL_MFR, s[6] as String)
-                put(COL_MIN, s[7] as Int)
-            }
-            db.insert(TBL_MED, null, cv)
-        }
-    }
-
 
     fun insertMedicine(m: Medicine): Long {
         val cv = ContentValues().apply {
@@ -147,7 +117,7 @@ class DatabaseHelper(context: Context) :
         if (category.isNotBlank() && category != "All") { conditions.add("$COL_CAT=?"); args.add(category) }
         val where = if (conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"
         val cursor = readableDatabase.rawQuery(
-            "SELECT * FROM $TBL_MED $where ORDER BY $COL_NAME ASC", args.toTypedArray()
+            "SELECT * FROM $TBL_MED $where ORDER BY $COL_ID DESC", args.toTypedArray()
         )
         cursor.use {
             while (it.moveToNext()) medicines.add(cursorToMedicine(it))
@@ -193,7 +163,6 @@ class DatabaseHelper(context: Context) :
         imageUri     = c.getString(c.getColumnIndexOrThrow(COL_IMG)).takeUnless { it.isNullOrBlank() }
     )
 
-
     fun insertSale(sale: Sale, items: List<CartItem>): Long {
         val db = writableDatabase
         db.beginTransaction()
@@ -234,15 +203,15 @@ class DatabaseHelper(context: Context) :
         cursor.use {
             while (it.moveToNext()) {
                 val id = it.getLong(it.getColumnIndexOrThrow(COL_ID))
-                list.add(
-                    Sale(
-                        id           = id,
-                        customerName = it.getString(it.getColumnIndexOrThrow(COL_CUST)),
-                        date         = it.getString(it.getColumnIndexOrThrow(COL_DATE)),
-                        total        = it.getDouble(it.getColumnIndexOrThrow(COL_TOTAL)),
-                        items        = getSaleItems(id)
-                    )
+                val s = Sale(
+                    id           = id,
+                    customerName = it.getString(it.getColumnIndexOrThrow(COL_CUST)),
+                    date         = it.getString(it.getColumnIndexOrThrow(COL_DATE)),
+                    total        = it.getDouble(it.getColumnIndexOrThrow(COL_TOTAL)),
+                    customerId   = ""
                 )
+                s.items = getSaleItems(id)
+                list.add(s)
             }
         }
         return list
@@ -267,7 +236,6 @@ class DatabaseHelper(context: Context) :
         }
         return list
     }
-
 
     fun getTotalMedicines(): Int {
         val c = readableDatabase.rawQuery("SELECT COUNT(*) FROM $TBL_MED", null)

@@ -4,7 +4,7 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="PharmaCare"
+        android:label="MediQuick"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MediQuick">
@@ -26,6 +26,7 @@
         <activity android:name=".ReceiptActivity"         android:exported="false"/>
         <activity android:name=".SalesHistoryActivity"    android:exported="false"/>
         <activity android:name=".LowStockActivity"        android:exported="false"/>
+        <activity android:name=".AddPharmacistActivity"   android:exported="false"/>
 
     </application>
 
