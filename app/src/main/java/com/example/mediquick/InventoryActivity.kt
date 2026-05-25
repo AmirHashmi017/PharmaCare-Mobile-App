@@ -80,12 +80,8 @@ class InventoryActivity : AppCompatActivity() {
     private fun loadData() {
         val query = findViewById<EditText>(R.id.etSearch).text.toString().trim()
         lifecycleScope.launch {
-            db.medicineDao().searchMedicines(query).collectLatest { list ->
-                val filtered = if (selectedCategory == "All") {
-                    list
-                } else {
-                    list.filter { it.category == selectedCategory }
-                }
+            db.medicineDao().searchMedicinesWithCategory(query, selectedCategory).collectLatest { list ->
+                val filtered = list
                 medicines.clear()
                 medicines.addAll(filtered)
                 adapter.notifyDataSetChanged()

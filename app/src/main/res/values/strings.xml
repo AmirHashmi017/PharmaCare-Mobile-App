@@ -21,7 +21,6 @@
     <string name="feature_alerts">Alerts</string>
     <string name="feature_alerts_sub">Restock before you run out</string>
     <string name="version">v1.1</string>
-
     <string name="log_out">Log out</string>
     <string name="stat_medicines">Medicines</string>
     <string name="stat_low_stock">Low stock</string>
@@ -37,9 +36,165 @@
     <string name="update">Update</string>
     <string name="delete">Delete</string>
 
+    <!-- Navigation -->
+    <string name="navigate_up">Navigate up</string>
+
+    <!-- Add/Edit Medicine Activity -->
+    <string name="add_medicine">Add Medicine</string>
+    <string name="edit_medicine">Edit Medicine</string>
+    <string name="medicine_image">Medicine Image</string>
+    <string name="medicine_photo">Medicine Photo</string>
+    <string name="optional">(Optional)</string>
+    <string name="add_photo">Add Photo</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="medicine_name_required">Medicine Name *</string>
+    <string name="medicine_name_hint">Enter medicine name</string>
+    <string name="manufacturer_optional">Manufacturer (Optional)</string>
+    <string name="manufacturer_hint">Enter manufacturer name</string>
+    <string name="price_rs_required">Price (Rs.) *</string>
+    <string name="price_hint">0.00</string>
+    <string name="stock_qty_required">Stock Quantity *</string>
+    <string name="stock_hint">0</string>
+    <string name="unit_label">Unit (e.g. tablets, ml)</string>
+    <string name="unit_hint">tablets</string>
+    <string name="min_stock_threshold">Min Stock Threshold</string>
+    <string name="min_stock_hint">10</string>
+    <string name="expiry_required">Expiry Date *</string>
+    <string name="tap_select_date">Tap to select date</string>
+    <string name="save_medicine">Save Medicine</string>
+    <string name="description_optional">Description (Optional)</string>
+    <string name="description_hint">Enter description</string>
+    <string name="category_optional">Category (Optional)</string>
+    <string name="category_hint">e.g. Antibiotic, Painkiller</string>
+    <string name="barcode_optional">Barcode (Optional)</string>
+    <string name="barcode_hint">Scan or enter barcode</string>
+
+    <!-- Billing Activity -->
+    <string name="search_add_medicines_hint">Search and add medicines…</string>
+    <string name="cart_label">Cart</string>
+    <string name="cart_items_zero">0 items</string>
+    <string name="customer_optional">Customer Name (Optional)</string>
+    <string name="customer_hint">Enter customer name</string>
+    <string name="subtotal_label">Subtotal</string>
+    <string name="discount_label">Discount</string>
+    <string name="tax_label">Tax</string>
+    <string name="total_label">Total</string>
+    <string name="checkout_button">Checkout</string>
+    <string name="clear_cart">Clear Cart</string>
+    <string name="empty_cart">Cart is empty</string>
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="remove_from_cart">Remove</string>
+    <string name="qty_label">Qty</string>
+    <string name="payment_method_label">Payment Method</string>
+    <string name="cash_payment">Cash</string>
+    <string name="card_payment">Card</string>
+    <string name="print_receipt">Print Receipt</string>
+    <string name="order_placed">Order placed successfully</string>
+    <string name="prescription_optional">Prescription No. (Optional)</string>
+
+    <!-- Inventory -->
+    <string name="search_medicines_hint">Search medicines…</string>
+    <string name="no_medicines_found">No medicines found</string>
+    <string name="add_new_medicine">+ Add Medicine</string>
+    <string name="stock_label">Stock</string>
+    <string name="expiry_label">Expiry</string>
+    <string name="price_label">Price</string>
+    <string name="low_stock_warning">Low stock!</string>
+    <string name="expired_warning">Expired!</string>
+    <string name="expiring_soon_warning">Expiring soon</string>
+    <string name="filter_all">All</string>
+    <string name="filter_low_stock">Low Stock</string>
+    <string name="filter_expiring">Expiring Soon</string>
+    <string name="sort_by_name">Name</string>
+    <string name="sort_by_stock">Stock</string>
+    <string name="sort_by_expiry">Expiry</string>
+
+    <!-- Sales / Orders -->
+    <string name="order_id_label">Order #</string>
+    <string name="date_label">Date</string>
+    <string name="amount_label">Amount</string>
+    <string name="no_orders_found">No orders found</string>
+    <string name="today_label">Today</string>
+    <string name="this_week_label">This Week</string>
+    <string name="this_month_label">This Month</string>
+
+    <!-- Alerts -->
+    <string name="no_alerts">No alerts right now</string>
+    <string name="reorder_now">Reorder Now</string>
+    <string name="items_below_threshold">%d item(s) below threshold</string>
+
+    <!-- Dialogs & Actions -->
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok">OK</string>
+    <string name="save">Save</string>
+    <string name="close">Close</string>
+    <string name="retry">Retry</string>
+    <string name="delete_medicine_title">Delete Medicine</string>
+    <string name="delete_medicine_message">Are you sure you want to delete this medicine? This action cannot be undone.</string>
+    <string name="logout_title">Log Out</string>
+    <string name="logout_message">Are you sure you want to log out?</string>
+
+    <!-- Errors & Validation -->
+    <string name="error_name_required">Medicine name is required</string>
+    <string name="error_price_required">Price is required</string>
+    <string name="error_stock_required">Stock quantity is required</string>
+    <string name="error_expiry_required">Expiry date is required</string>
+    <string name="error_invalid_price">Enter a valid price</string>
+    <string name="error_invalid_stock">Enter a valid quantity</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">Network error. Check your connection.</string>
+    <string name="error_login_failed">Login failed. Check your credentials.</string>
+    <string name="error_name_empty">Name cannot be empty</string>
+    <string name="error_phone_invalid">Enter a valid phone number</string>
+    <string name="error_password_short">Password must be at least 6 characters</string>
+    <string name="error_passwords_no_match">Passwords do not match</string>
+
+    <!-- Loading -->
+    <string name="loading">Loading…</string>
+    <string name="saving">Saving…</string>
+    <string name="please_wait">Please wait…</string>
+
+    <!-- String arrays -->
     <string-array name="time_filters">
         <item>Today</item>
         <item>Last Week</item>
         <item>Last Month</item>
     </string-array>
+
+    <string-array name="payment_methods">
+        <item>Cash</item>
+        <item>Card</item>
+        <item>Bank Transfer</item>
+    </string-array>
+
+    <string-array name="medicine_units">
+        <item>Tablets</item>
+        <item>Capsules</item>
+        <item>ml</item>
+        <item>mg</item>
+        <item>Syrup (ml)</item>
+        <item>Injection</item>
+        <item>Sachet</item>
+        <item>Strips</item>
+    </string-array>
+    <!-- Billing extras -->
+    <string name="total_placeholder">Rs. 0.00</string>
+    <string name="checkout">Checkout</string>
+
+    <!-- Inventory -->
+    <string name="inventory_empty">No medicines in inventory.\nTap + to add one.</string>
+
+    <!-- Low Stock -->
+    <string name="low_stock_count_placeholder">0 items low</string>
+    <string name="all_stocked">All medicines are well stocked!</string>
+
+    <!-- Receipt -->
+    <string name="payment_success">Payment Successful</string>
+    <string name="receipt_id_label">Receipt ID</string>
+    <string name="customer_label">Customer</string>
+    <string name="total_uppercase">TOTAL</string>
+    <string name="back_to_billing">Back to Billing</string>
 </resources>

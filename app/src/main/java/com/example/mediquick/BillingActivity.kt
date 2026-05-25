@@ -4,6 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -42,7 +45,7 @@ class BillingActivity : AppCompatActivity() {
         val rvCart = findViewById<RecyclerView>(R.id.rvCart)
         cartAdapter = CartAdapter(
             cart,
-            onRemove = { pos: Int -> removeFromCart(pos) },
+            onRemove = { pos -> removeFromCart(pos) },
             onQuantityChanged = { updateTotal() }
         )
         rvCart.layoutManager = LinearLayoutManager(this)
@@ -62,7 +65,7 @@ class BillingActivity : AppCompatActivity() {
     private fun loadMedicines() {
         val q = findViewById<EditText>(R.id.etSearch).text.toString()
         lifecycleScope.launch {
-            db.medicineDao().searchMedicines(q).collectLatest { list ->
+            db.medicineDao().searchMedicinesWithCategory(q, "All").collectLatest{ list ->
                 medicines.clear()
                 medicines.addAll(list)
                 medAdapter.notifyDataSetChanged()
@@ -114,6 +117,7 @@ class BillingActivity : AppCompatActivity() {
         val customerName = findViewById<EditText>(R.id.etCustomer).text.toString().trim()
             .ifEmpty { user?.name ?: "Walk-in Customer" }
 
+        // Determine status: Users place PENDING orders, Pharmacists/Admin make COMPLETED sales
         val status = if (user?.role == UserRole.USER) "PAYMENT_PENDING" else "COMPLETED"
 
         lifecycleScope.launch {
@@ -138,15 +142,14 @@ class BillingActivity : AppCompatActivity() {
                 )
                 db.saleDao().insertSaleItem(saleItem)
                 
+                // Update stock
                 val updatedMed = item.medicine.copy(stock = item.medicine.stock - item.quantity)
                 db.medicineDao().updateMedicine(updatedMed)
             }
 
             runOnUiThread {
                 Toast.makeText(this@BillingActivity, "Order placed successfully!", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this@BillingActivity, ReceiptActivity::class.java)
-                intent.putExtra("sale_id", saleId)
-                startActivity(intent)
+                startActivity(Intent(this@BillingActivity, ReceiptActivity::class.java).putExtra("sale_id", saleId))
                 finish()
             }
         }
