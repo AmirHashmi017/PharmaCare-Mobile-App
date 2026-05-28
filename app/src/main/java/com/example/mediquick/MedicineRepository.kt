@@ -1,5 +1,6 @@
 package com.example.mediquick
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
@@ -17,8 +18,9 @@ class MedicineRepository(private val medicineDao: MedicineDao) {
         val medWithId = medicine.copy(id = id)
         try {
             medsCollection.document(id.toString()).set(toMap(medWithId)).await()
+            Log.d("MediQuick", "✅ Medicine saved to Firestore: ${medWithId.name} id=$id")
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("MediQuick", "❌ Firestore save failed: ${e.message}")
         }
         return id
     }
@@ -27,8 +29,9 @@ class MedicineRepository(private val medicineDao: MedicineDao) {
         medicineDao.updateMedicine(medicine)
         try {
             medsCollection.document(medicine.id.toString()).set(toMap(medicine)).await()
+            Log.d("MediQuick", "✅ Medicine updated in Firestore: ${medicine.name}")
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("MediQuick", "❌ Firestore update failed: ${e.message}")
         }
     }
 
@@ -36,43 +39,62 @@ class MedicineRepository(private val medicineDao: MedicineDao) {
         medicineDao.deleteMedicine(medicine)
         try {
             medsCollection.document(medicine.id.toString()).delete().await()
+            Log.d("MediQuick", "✅ Medicine deleted from Firestore: ${medicine.name}")
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("MediQuick", "❌ Firestore delete failed: ${e.message}")
         }
     }
 
     suspend fun getMedicineById(id: Long): Medicine? = medicineDao.getMedicineById(id)
 
-    /**
-     * Pull all medicines from Firestore into local Room.
-     * Called on app startup so the local DB is always populated from Firestore.
-     */
     suspend fun syncFromFirestore() {
         try {
+            Log.d("MediQuick", "🔄 Starting medicine sync from Firestore...")
             val snapshot = medsCollection.get().await()
+            Log.d("MediQuick", "📦 Firestore returned ${snapshot.documents.size} medicine documents")
+
+            if (snapshot.documents.isEmpty()) {
+                Log.w("MediQuick", "⚠️ No medicines found in Firestore collection 'medicines'")
+                return
+            }
+
             for (doc in snapshot.documents) {
+                Log.d("MediQuick", "📄 Raw doc id=${doc.id} data=${doc.data}")
                 try {
+                    val rawId = doc.getLong("id")
+                    val name  = doc.getString("name")
+
+                    if (name.isNullOrBlank()) {
+                        Log.w("MediQuick", "⚠️ Skipping doc ${doc.id} — name is null/blank")
+                        continue
+                    }
+
                     val med = Medicine(
-                        id           = (doc.getLong("id") ?: 0L),
-                        name         = doc.getString("name") ?: continue,
-                        category     = doc.getString("category") ?: "",
-                        price        = doc.getDouble("price") ?: 0.0,
-                        stock        = (doc.getLong("stock") ?: 0L).toInt(),
-                        unit         = doc.getString("unit") ?: "tablets",
-                        expiryDate   = doc.getString("expiryDate") ?: "",
-                        manufacturer = doc.getString("manufacturer") ?: "",
-                        minStock     = (doc.getLong("minStock") ?: 10L).toInt(),
-                        imageUri     = doc.getString("imageUri"),
-                        addedBy      = doc.getString("addedBy"),
+                        id            = rawId ?: 0L,
+                        name          = name,
+                        category      = doc.getString("category") ?: "Others",
+                        price         = doc.getDouble("price") ?: 0.0,
+                        stock         = (doc.getLong("stock") ?: 0L).toInt(),
+                        unit          = doc.getString("unit") ?: "tablets",
+                        expiryDate    = doc.getString("expiryDate") ?: "",
+                        manufacturer  = doc.getString("manufacturer") ?: "",
+                        minStock      = (doc.getLong("minStock") ?: 10L).toInt(),
+                        imageUri      = doc.getString("imageUri"),
+                        addedBy       = doc.getString("addedBy"),
                         lastUpdatedBy = doc.getString("lastUpdatedBy")
                     )
                     medicineDao.insertMedicine(med)
+                    Log.d("MediQuick", "✅ Inserted medicine into Room: ${med.name} id=${med.id}")
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.e("MediQuick", "❌ Error parsing doc ${doc.id}: ${e.message}")
                 }
             }
+
+            val roomCount = medicineDao.getCount()
+            Log.d("MediQuick", "✅ Sync complete. Room now has $roomCount medicines")
+
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("MediQuick", "❌ syncFromFirestore FAILED: ${e.message}", e)
         }
     }
 

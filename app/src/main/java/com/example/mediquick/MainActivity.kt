@@ -2,14 +2,17 @@ package com.example.mediquick
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -74,46 +77,73 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadUserAndSync() {
         lifecycleScope.launch {
-            // 1. Resolve current user
+            Log.d("MediQuick", "=== loadUserAndSync START ===")
+
+            // Step 1: resolve user
             var user: User? = db.userDao().getUserById("ADMIN_ID")
             if (user == null) {
                 val uid = auth.currentUser?.uid
+                Log.d("MediQuick", "Firebase UID = $uid")
                 if (uid != null) user = db.userDao().getUserById(uid)
             }
 
             if (user == null) {
+                Log.w("MediQuick", "No user found — redirecting to SignIn")
                 startActivity(Intent(this@MainActivity, SignInActivity::class.java))
                 finish()
                 return@launch
             }
 
+            Log.d("MediQuick", "User loaded: ${user.name} role=${user.role} uid=${user.uid}")
             currentUser = user
             updateUI()
 
-            // 2. Sync Firestore → Room so local DB is always up to date
-            syncFromFirestore(user)
+            // Step 2: DEBUG — check Firestore directly before sync
+            debugFirestoreDirectly()
 
-            // 3. Refresh stats after sync
+            // Step 3: sync
+            Log.d("MediQuick", "--- Starting Firestore sync ---")
+            try {
+                medicineRepository.syncFromFirestore()
+            } catch (e: Exception) {
+                Log.e("MediQuick", "Medicine sync exception: ${e.message}", e)
+            }
+            try {
+                saleRepository.syncFromFirestore(user.uid, user.role)
+            } catch (e: Exception) {
+                Log.e("MediQuick", "Sale sync exception: ${e.message}", e)
+            }
+            Log.d("MediQuick", "--- Sync done ---")
+
+            // Step 4: refresh stats after sync
             refreshStats()
         }
     }
 
     /**
-     * Pulls medicines and sales from Firestore into local Room.
-     * This is what makes data visible after a fresh install.
+     * Raw Firestore read — bypasses all repository logic to confirm
+     * what is actually in the 'medicines' collection right now.
      */
-    private suspend fun syncFromFirestore(user: User) {
+    private suspend fun debugFirestoreDirectly() {
         try {
-            // Always sync medicines (all roles need the inventory)
-            medicineRepository.syncFromFirestore()
+            val firestore = FirebaseFirestore.getInstance()
+
+            // Check medicines
+            val medSnap = firestore.collection("medicines").get().await()
+            Log.d("MediQuick", "🔍 DEBUG: 'medicines' collection has ${medSnap.size()} docs")
+            for (doc in medSnap.documents) {
+                Log.d("MediQuick", "  medicine doc: id=${doc.id} name=${doc.getString("name")}")
+            }
+
+            // Check sales
+            val saleSnap = firestore.collection("sales").get().await()
+            Log.d("MediQuick", "🔍 DEBUG: 'sales' collection has ${saleSnap.size()} docs")
+            for (doc in saleSnap.documents) {
+                Log.d("MediQuick", "  sale doc: id=${doc.id} customer=${doc.getString("customerName")} status=${doc.getString("status")}")
+            }
+
         } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        try {
-            // Sync sales relevant to this user's role
-            saleRepository.syncFromFirestore(user.uid, user.role)
-        } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("MediQuick", "🔍 DEBUG Firestore direct read FAILED: ${e.message}", e)
         }
     }
 
@@ -195,17 +225,18 @@ class MainActivity : AppCompatActivity() {
     private fun refreshStats() {
         val user = currentUser ?: return
         lifecycleScope.launch {
-            val totalMeds      = db.medicineDao().getCount()
-            val lowStockItems  = db.medicineDao().getLowStockMedicines().first()
+            val totalMeds     = db.medicineDao().getCount()
+            val lowStockItems = db.medicineDao().getLowStockMedicines().first()
+
+            Log.d("MediQuick", "Stats: totalMeds=$totalMeds lowStock=${lowStockItems.size}")
 
             findViewById<TextView>(R.id.tvStatMedicines).text = totalMeds.toString()
             findViewById<TextView>(R.id.tvStatLowStock).text  = lowStockItems.size.toString()
 
-            val statsVal   = findViewById<TextView>(R.id.tvStatTotalSales)
-            val statsLabel = findViewById<TextView>(R.id.tvStatTotalSalesLabel)
-            val revenueVal = findViewById<TextView>(R.id.tvStatTodaySales)
-
-            val startDate = getStartDate(selectedTimeFilter)
+            val statsVal    = findViewById<TextView>(R.id.tvStatTotalSales)
+            val statsLabel  = findViewById<TextView>(R.id.tvStatTotalSalesLabel)
+            val revenueVal  = findViewById<TextView>(R.id.tvStatTodaySales)
+            val startDate   = getStartDate(selectedTimeFilter)
 
             val salesFlow = when (user.role) {
                 UserRole.ADMIN      -> db.saleDao().getSalesFromDate(startDate)
@@ -214,7 +245,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             val sales = salesFlow.first()
-            statsVal.text  = sales.size.toString()
+            Log.d("MediQuick", "Stats: sales count=${sales.size}")
+
+            statsVal.text   = sales.size.toString()
             statsLabel.text = if (user.role == UserRole.USER) "My Orders" else "Total Orders"
 
             val completedRevenue = sales.filter {
