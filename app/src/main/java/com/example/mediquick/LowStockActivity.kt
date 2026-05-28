@@ -32,7 +32,7 @@ class LowStockActivity : AppCompatActivity() {
         rv.layoutManager = LinearLayoutManager(this)
         adapter = MedicineAdapter(
             lowStockList,
-            onEdit        = { med -> 
+            onEdit        = { med ->
                 val intent = Intent(this, AddEditMedicineActivity::class.java)
                 intent.putExtra("medicine_id", med.id)
                 startActivity(intent)
@@ -48,9 +48,9 @@ class LowStockActivity : AppCompatActivity() {
                 lowStockList.clear()
                 lowStockList.addAll(list)
                 adapter.notifyDataSetChanged()
-                
+
                 findViewById<TextView>(R.id.tvAlertCount).text = "${list.size} low-stock items"
-                
+
                 if (list.isEmpty()) {
                     rv.visibility = View.GONE
                     findViewById<TextView>(R.id.tvEmpty).visibility = View.VISIBLE

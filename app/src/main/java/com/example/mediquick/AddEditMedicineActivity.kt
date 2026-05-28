@@ -86,7 +86,7 @@ class AddEditMedicineActivity : AppCompatActivity() {
                     tvExpiry.text  = m.expiryDate
                     val unitIdx = MedicineConstants.UNITS.indexOf(m.unit).coerceAtLeast(0)
                     spinUnit.setSelection(unitIdx)
-                    m.imageUri?.let { 
+                    m.imageUri?.let {
                         selectedImageUri = Uri.parse(it)
                         renderSelectedImage()
                     }
@@ -134,7 +134,7 @@ class AddEditMedicineActivity : AppCompatActivity() {
                 } else {
                     db.medicineDao().insertMedicine(med)
                 }
-                
+
                 runOnUiThread {
                     Toast.makeText(this@AddEditMedicineActivity, if (isEdit) "Medicine updated!" else "Medicine added!", Toast.LENGTH_SHORT).show()
                     finish()

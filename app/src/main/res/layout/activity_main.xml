@@ -125,7 +125,6 @@
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
                             <TextView
-                                android:id="@+id/tvStatMedicinesLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Medicines"
@@ -156,7 +155,6 @@
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                             <TextView
-                                android:id="@+id/tvStatTodaySalesLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Revenue"
@@ -218,7 +216,6 @@
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
                             <TextView
-                                android:id="@+id/tvStatLowStockLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Low Stock"
@@ -244,7 +241,7 @@
                     android:layout_marginTop="12dp"
                     android:orientation="vertical">
 
-                    <!-- Admin only Add Pharmacist card -->
+                    <!-- Admin: Add Pharmacist -->
                     <LinearLayout
                         android:id="@+id/cardAddPharmacist"
                         android:layout_width="match_parent"
@@ -257,11 +254,61 @@
                         android:orientation="horizontal"
                         android:padding="16dp"
                         android:visibility="gone">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_add_fab" app:tint="@color/green_primary" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Add New Pharmacist" android:textColor="@color/navy" android:textSize="15sp" android:textStyle="bold" />
-                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_chevron_right" />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_add_fab"
+                            app:tint="@color/green_primary" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Add New Pharmacist"
+                            android:textColor="@color/navy"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right" />
                     </LinearLayout>
 
+                    <!-- Admin: Pharmacist Performance -->
+                    <LinearLayout
+                        android:id="@+id/cardPharmacistStats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_feature_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:visibility="gone">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_history"
+                            app:tint="@color/accent_blue" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Pharmacist Performance"
+                            android:textColor="@color/navy"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right" />
+                    </LinearLayout>
+
+                    <!-- Common: Inventory -->
                     <LinearLayout
                         android:id="@+id/cardInventory"
                         android:layout_width="match_parent"
@@ -274,11 +321,26 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_inventory" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Medicine Inventory" android:textColor="@color/navy" android:textSize="15sp" android:textStyle="bold" />
-                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_chevron_right" />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_inventory" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Medicine Inventory"
+                            android:textColor="@color/navy"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right" />
                     </LinearLayout>
 
+                    <!-- Common: Billing/Orders -->
                     <LinearLayout
                         android:id="@+id/cardBilling"
                         android:layout_width="match_parent"
@@ -291,11 +353,27 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_billing" />
-                        <TextView android:id="@+id/tvBillingTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Create Order" android:textColor="@color/navy" android:textSize="15sp" android:textStyle="bold" />
-                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_chevron_right" />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_billing" />
+                        <TextView
+                            android:id="@+id/tvBillingTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Create Order"
+                            android:textColor="@color/navy"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right" />
                     </LinearLayout>
 
+                    <!-- Common: History -->
                     <LinearLayout
                         android:id="@+id/cardHistory"
                         android:layout_width="match_parent"
@@ -308,11 +386,27 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" />
-                        <TextView android:id="@+id/tvHistoryTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Sales History" android:textColor="@color/navy" android:textSize="15sp" android:textStyle="bold" />
-                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_chevron_right" />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_history" />
+                        <TextView
+                            android:id="@+id/tvHistoryTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Sales History"
+                            android:textColor="@color/navy"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right" />
                     </LinearLayout>
 
+                    <!-- Common: Low Stock -->
                     <LinearLayout
                         android:id="@+id/cardAlerts"
                         android:layout_width="match_parent"
@@ -325,9 +419,23 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_alert" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Low Stock Alerts" android:textColor="@color/navy" android:textSize="15sp" android:textStyle="bold" />
-                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_chevron_right" />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_alert" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Low Stock Alerts"
+                            android:textColor="@color/navy"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right" />
                     </LinearLayout>
 
                 </LinearLayout>

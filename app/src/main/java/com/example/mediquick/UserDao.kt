@@ -12,4 +12,7 @@ interface UserDao {
 
     @Query("DELETE FROM users")
     suspend fun clearUsers()
+
+    @Query("SELECT * FROM users WHERE role = 'PHARMACIST'")
+    suspend fun getAllPharmacists(): List<User>
 }

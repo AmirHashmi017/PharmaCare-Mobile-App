@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        
+
         db = AppDatabase.getDatabase(this)
         auth = FirebaseAuth.getInstance()
 
@@ -38,6 +38,9 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.cardAddPharmacist).setOnClickListener {
             startActivity(Intent(this, AddPharmacistActivity::class.java))
+        }
+        findViewById<View>(R.id.cardPharmacistStats).setOnClickListener {
+            startActivity(Intent(this, PharmacistStatsActivity::class.java))
         }
 
         findViewById<TextView>(R.id.tvLogout).setOnClickListener {
@@ -80,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                 finish()
                 return@launch
             }
-            
+
             currentUser = user
             updateUI()
             refreshStats()
@@ -90,7 +93,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateUI() {
         val user = currentUser ?: return
         findViewById<TextView>(R.id.tvPharmacyName).text = "MediQuick"
-        
+
         val roleDisplay = when(user.role) {
             UserRole.ADMIN -> "System Administrator"
             UserRole.PHARMACIST -> "Pharmacist"
@@ -103,8 +106,9 @@ class MainActivity : AppCompatActivity() {
         val cardHistory = findViewById<View>(R.id.cardHistory)
         val cardAlerts = findViewById<View>(R.id.cardAlerts)
         val cardAddPharmacist = findViewById<View>(R.id.cardAddPharmacist)
+        val cardPharmacistStats = findViewById<View>(R.id.cardPharmacistStats)
         val fab = findViewById<FloatingActionButton>(R.id.fab)
-        
+
         val tvHistoryTitle = findViewById<TextView>(R.id.tvHistoryTitle)
         val tvBillingTitle = findViewById<TextView>(R.id.tvBillingTitle)
 
@@ -114,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         cardHistory.visibility = View.VISIBLE
         cardAlerts.visibility = View.VISIBLE
         cardAddPharmacist.visibility = View.GONE
+        cardPharmacistStats.visibility = View.GONE
         findViewById<View>(R.id.statCardRevenue).visibility = View.VISIBLE
         findViewById<View>(R.id.statCardLowStock).visibility = View.VISIBLE
         findViewById<View>(R.id.filterLayout).visibility = View.VISIBLE
@@ -123,21 +128,24 @@ class MainActivity : AppCompatActivity() {
                 cardBilling.visibility = View.GONE
                 cardAddPharmacist.visibility = View.VISIBLE
                 fab.visibility = View.GONE
+                cardPharmacistStats.visibility = View.VISIBLE
                 tvHistoryTitle.text = "Sales History"
             }
             UserRole.PHARMACIST -> {
                 cardAddPharmacist.visibility = View.GONE
                 fab.visibility = View.VISIBLE
+                cardPharmacistStats.visibility = View.GONE
                 tvHistoryTitle.text = "Sales History"
                 tvBillingTitle.text = "Create Sale"
             }
             UserRole.USER -> {
                 cardInventory.visibility = View.GONE
                 cardAlerts.visibility = View.GONE
+                cardPharmacistStats.visibility = View.GONE
                 fab.visibility = View.GONE
                 tvHistoryTitle.text = "My Purchase History"
                 tvBillingTitle.text = "Order Medicines"
-                
+
                 findViewById<View>(R.id.statCardRevenue).visibility = View.GONE
                 findViewById<View>(R.id.statCardLowStock).visibility = View.GONE
                 findViewById<View>(R.id.filterLayout).visibility = View.GONE
@@ -165,14 +173,14 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val totalMeds = db.medicineDao().getCount()
             val lowStockItems = db.medicineDao().getLowStockMedicines().first()
-            
+
             findViewById<TextView>(R.id.tvStatMedicines).text = totalMeds.toString()
             findViewById<TextView>(R.id.tvStatLowStock).text = lowStockItems.size.toString()
 
             val statsVal = findViewById<TextView>(R.id.tvStatTotalSales)
             val statsLabel = findViewById<TextView>(R.id.tvStatTotalSalesLabel)
             val revenueVal = findViewById<TextView>(R.id.tvStatTodaySales)
-            
+
             val startDate = getStartDate(selectedTimeFilter)
 
             val salesFlow = when (user.role) {
@@ -180,15 +188,15 @@ class MainActivity : AppCompatActivity() {
                 UserRole.PHARMACIST -> db.saleDao().getSalesFromDateByPharmacist(user.uid, startDate)
                 UserRole.USER -> db.saleDao().getSalesFromDateByCustomer(user.uid, startDate)
             }
-            
+
             val sales = salesFlow.first()
             statsVal.text = sales.size.toString()
             statsLabel.text = if (user.role == UserRole.USER) "My Orders" else "Total Orders"
-            
-            val completedRevenue = sales.filter { 
+
+            val completedRevenue = sales.filter {
                 it.status == "COMPLETED" || it.status == "PAYMENT_DONE" || it.status == "IN_SHIPPING"
             }.sumOf { it.total }
-            
+
             val fmt = java.text.DecimalFormat("#,##0.00")
             revenueVal.text = "Rs ${fmt.format(completedRevenue)}"
         }

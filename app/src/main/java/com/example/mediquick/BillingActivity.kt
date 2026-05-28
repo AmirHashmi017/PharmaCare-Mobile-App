@@ -111,7 +111,7 @@ class BillingActivity : AppCompatActivity() {
         if (cart.isEmpty()) return
         val total = cart.sumOf { it.subtotal }
         val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
-        
+
         val user = currentUser
         val uid = user?.uid ?: "GUEST"
         val customerName = findViewById<EditText>(R.id.etCustomer).text.toString().trim()
@@ -129,9 +129,9 @@ class BillingActivity : AppCompatActivity() {
                 status = status,
                 pharmacistId = if (user?.role == UserRole.PHARMACIST) uid else null
             )
-            
+
             val saleId = db.saleDao().insertSale(sale)
-            
+
             for (item in cart) {
                 val saleItem = SaleItem(
                     saleId = saleId,
@@ -141,7 +141,7 @@ class BillingActivity : AppCompatActivity() {
                     priceEach = item.medicine.price
                 )
                 db.saleDao().insertSaleItem(saleItem)
-                
+
                 // Update stock
                 val updatedMed = item.medicine.copy(stock = item.medicine.stock - item.quantity)
                 db.medicineDao().updateMedicine(updatedMed)
