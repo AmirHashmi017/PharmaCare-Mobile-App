@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 class BillingActivity : AppCompatActivity() {
 
     private lateinit var db: AppDatabase
+    private lateinit var saleRepository: SaleRepository
+    private lateinit var medicineRepository: MedicineRepository
     private val medicines = mutableListOf<Medicine>()
     private val cart = mutableListOf<CartItem>()
     private lateinit var medAdapter: MedicineAdapter
@@ -29,6 +31,8 @@ class BillingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_billing)
         db = AppDatabase.getDatabase(this)
+        saleRepository = SaleRepository(db.saleDao())
+        medicineRepository = MedicineRepository(db.medicineDao())
 
         findViewById<ImageView>(R.id.ivBack).setOnClickListener { finish() }
 
@@ -65,7 +69,7 @@ class BillingActivity : AppCompatActivity() {
     private fun loadMedicines() {
         val q = findViewById<EditText>(R.id.etSearch).text.toString()
         lifecycleScope.launch {
-            db.medicineDao().searchMedicinesWithCategory(q, "All").collectLatest{ list ->
+            db.medicineDao().searchMedicinesWithCategory(q, "All").collectLatest { list ->
                 medicines.clear()
                 medicines.addAll(list)
                 medAdapter.notifyDataSetChanged()
@@ -117,7 +121,6 @@ class BillingActivity : AppCompatActivity() {
         val customerName = findViewById<EditText>(R.id.etCustomer).text.toString().trim()
             .ifEmpty { user?.name ?: "Walk-in Customer" }
 
-        // Determine status: Users place PENDING orders, Pharmacists/Admin make COMPLETED sales
         val status = if (user?.role == UserRole.USER) "PAYMENT_PENDING" else "COMPLETED"
 
         lifecycleScope.launch {
@@ -130,26 +133,21 @@ class BillingActivity : AppCompatActivity() {
                 pharmacistId = if (user?.role == UserRole.PHARMACIST) uid else null
             )
 
-            val saleId = db.saleDao().insertSale(sale)
+            // Uses SaleRepository — saves to both Room AND Firestore
+            val saleId = saleRepository.insertSaleWithItems(sale, cart)
 
+            // Update stock via repository so Firestore stock count stays in sync too
             for (item in cart) {
-                val saleItem = SaleItem(
-                    saleId = saleId,
-                    medicineId = item.medicine.id,
-                    medicineName = item.medicine.name,
-                    quantity = item.quantity,
-                    priceEach = item.medicine.price
-                )
-                db.saleDao().insertSaleItem(saleItem)
-
-                // Update stock
                 val updatedMed = item.medicine.copy(stock = item.medicine.stock - item.quantity)
-                db.medicineDao().updateMedicine(updatedMed)
+                medicineRepository.update(updatedMed)
             }
 
             runOnUiThread {
                 Toast.makeText(this@BillingActivity, "Order placed successfully!", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this@BillingActivity, ReceiptActivity::class.java).putExtra("sale_id", saleId))
+                startActivity(
+                    Intent(this@BillingActivity, ReceiptActivity::class.java)
+                        .putExtra("sale_id", saleId)
+                )
                 finish()
             }
         }

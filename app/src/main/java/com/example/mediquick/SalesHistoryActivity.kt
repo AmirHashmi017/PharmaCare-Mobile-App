@@ -18,6 +18,7 @@ class SalesHistoryActivity : AppCompatActivity() {
 
     private lateinit var db: AppDatabase
     private lateinit var auth: FirebaseAuth
+    private lateinit var saleRepository: SaleRepository
     private var currentUser: User? = null
     private lateinit var adapter: SalesAdapter
 
@@ -27,20 +28,20 @@ class SalesHistoryActivity : AppCompatActivity() {
 
         db = AppDatabase.getDatabase(this)
         auth = FirebaseAuth.getInstance()
+        saleRepository = SaleRepository(db.saleDao())
+
         findViewById<ImageView>(R.id.ivBack).setOnClickListener { finish() }
 
-        val tvTitle = findViewById<TextView>(R.id.tvTitle) // Make sure this exists in XML
-        val statsHeader = findViewById<View>(R.id.layoutStatsHeader) // Make sure this exists or group it
-
+        val tvTitle = findViewById<TextView>(R.id.tvTitle)
         val rv = findViewById<RecyclerView>(R.id.rvSales)
         rv.layoutManager = LinearLayoutManager(this)
 
         lifecycleScope.launch {
             val uid = auth.currentUser?.uid ?: "ADMIN_ID"
             currentUser = db.userDao().getUserById(uid)
-            
+
             val user = currentUser ?: return@launch
-            
+
             if (user.role == UserRole.USER) {
                 tvTitle?.text = "My Purchase History"
                 findViewById<View>(R.id.cardRevenue)?.visibility = View.GONE
@@ -56,17 +57,20 @@ class SalesHistoryActivity : AppCompatActivity() {
             }
 
             salesFlow.collectLatest { sales ->
-                adapter = SalesAdapter(sales, user, 
+                adapter = SalesAdapter(
+                    sales, user,
                     onUpdateStatus = { sale, status -> updateStatus(sale, status) },
                     onCancel = { sale -> cancelOrder(sale) }
                 )
                 rv.adapter = adapter
-                
+
                 val fmt = java.text.DecimalFormat("#,##0.00")
-                val total = sales.filter { it.status == "COMPLETED" || it.status == "PAYMENT_DONE" }.sumOf { it.total }
+                val total = sales.filter {
+                    it.status == "COMPLETED" || it.status == "PAYMENT_DONE"
+                }.sumOf { it.total }
                 findViewById<TextView>(R.id.tvTotalRevenue).text  = "Rs ${fmt.format(total)}"
                 findViewById<TextView>(R.id.tvTotalSalesCount).text = "${sales.size} orders"
-                
+
                 if (sales.isEmpty()) {
                     rv.visibility = View.GONE
                     findViewById<TextView>(R.id.tvEmpty).visibility = View.VISIBLE
@@ -80,7 +84,8 @@ class SalesHistoryActivity : AppCompatActivity() {
 
     private fun updateStatus(sale: Sale, status: String) {
         lifecycleScope.launch {
-            db.saleDao().updateStatus(sale.id, status, auth.currentUser?.uid)
+            // Repository updates both Room and Firestore
+            saleRepository.updateStatus(sale.id, status, auth.currentUser?.uid)
             Toast.makeText(this@SalesHistoryActivity, "Status updated to $status", Toast.LENGTH_SHORT).show()
         }
     }
@@ -91,7 +96,7 @@ class SalesHistoryActivity : AppCompatActivity() {
             .setMessage("Are you sure you want to cancel this order?")
             .setPositiveButton("Yes") { _, _ ->
                 lifecycleScope.launch {
-                    db.saleDao().cancelOrder(sale.id)
+                    saleRepository.cancelOrder(sale.id)
                     Toast.makeText(this@SalesHistoryActivity, "Order cancelled", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -145,9 +150,7 @@ class SalesAdapter(
                 val statuses = arrayOf("PAYMENT_DONE", "IN_SHIPPING", "COMPLETED", "CANCELLED")
                 AlertDialog.Builder(h.itemView.context)
                     .setTitle("Update Status")
-                    .setItems(statuses) { _, i ->
-                        onUpdateStatus(sale, statuses[i])
-                    }
+                    .setItems(statuses) { _, i -> onUpdateStatus(sale, statuses[i]) }
                     .show()
             }
         }

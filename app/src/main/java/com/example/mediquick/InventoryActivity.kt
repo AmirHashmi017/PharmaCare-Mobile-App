@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 class InventoryActivity : AppCompatActivity() {
 
     private lateinit var db: AppDatabase
+    private lateinit var medicineRepository: MedicineRepository
     private lateinit var adapter: MedicineAdapter
     private val medicines = mutableListOf<Medicine>()
     private var selectedCategory = "All"
@@ -28,12 +29,13 @@ class InventoryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_inventory)
 
         db = AppDatabase.getDatabase(this)
+        medicineRepository = MedicineRepository(db.medicineDao())
 
         findViewById<ImageView>(R.id.ivBack).setOnClickListener { finish() }
 
         val rv = findViewById<RecyclerView>(R.id.rvMedicines)
         adapter = MedicineAdapter(medicines,
-            onEdit   = { med -> 
+            onEdit   = { med ->
                 val intent = Intent(this, AddEditMedicineActivity::class.java)
                 intent.putExtra("medicine_id", med.id)
                 startActivity(intent)
@@ -52,7 +54,7 @@ class InventoryActivity : AppCompatActivity() {
         })
 
         setupCategorySpinner()
-        
+
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             startActivity(Intent(this, AddEditMedicineActivity::class.java))
         }
@@ -64,10 +66,10 @@ class InventoryActivity : AppCompatActivity() {
         categories.clear()
         categories.add("All")
         categories.addAll(MedicineConstants.CATEGORIES)
-        
+
         val spinner = findViewById<Spinner>(R.id.spinnerCategory)
         spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, categories)
-        
+
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) {
                 selectedCategory = categories[pos]
@@ -81,13 +83,13 @@ class InventoryActivity : AppCompatActivity() {
         val query = findViewById<EditText>(R.id.etSearch).text.toString().trim()
         lifecycleScope.launch {
             db.medicineDao().searchMedicinesWithCategory(query, selectedCategory).collectLatest { list ->
-                val filtered = list
                 medicines.clear()
-                medicines.addAll(filtered)
+                medicines.addAll(list)
                 adapter.notifyDataSetChanged()
-                
-                findViewById<TextView>(R.id.tvCount).text = "${filtered.size} medicines"
-                findViewById<TextView>(R.id.tvEmpty).visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+
+                findViewById<TextView>(R.id.tvCount).text = "${list.size} medicines"
+                findViewById<TextView>(R.id.tvEmpty).visibility =
+                    if (list.isEmpty()) View.VISIBLE else View.GONE
             }
         }
     }
@@ -96,9 +98,10 @@ class InventoryActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Delete Medicine")
             .setMessage("Delete '${med.name}'? This cannot be undone.")
-            .setPositiveButton("Delete") { _, _ -> 
+            .setPositiveButton("Delete") { _, _ ->
                 lifecycleScope.launch {
-                    db.medicineDao().deleteMedicine(med)
+                    // Use repository so Firestore is also updated
+                    medicineRepository.delete(med)
                 }
             }
             .setNegativeButton("Cancel", null)

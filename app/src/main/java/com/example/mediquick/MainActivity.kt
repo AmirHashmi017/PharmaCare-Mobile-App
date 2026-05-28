@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var db: AppDatabase
     private lateinit var auth: FirebaseAuth
+    private lateinit var medicineRepository: MedicineRepository
+    private lateinit var saleRepository: SaleRepository
     private var currentUser: User? = null
     private var selectedTimeFilter = "Today"
 
@@ -26,8 +28,10 @@ class MainActivity : AppCompatActivity() {
 
         db = AppDatabase.getDatabase(this)
         auth = FirebaseAuth.getInstance()
+        medicineRepository = MedicineRepository(db.medicineDao())
+        saleRepository = SaleRepository(db.saleDao())
 
-        loadUserData()
+        loadUserAndSync()
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             val user = currentUser
@@ -68,14 +72,13 @@ class MainActivity : AppCompatActivity() {
         setupNavigation()
     }
 
-    private fun loadUserData() {
+    private fun loadUserAndSync() {
         lifecycleScope.launch {
+            // 1. Resolve current user
             var user: User? = db.userDao().getUserById("ADMIN_ID")
             if (user == null) {
                 val uid = auth.currentUser?.uid
-                if (uid != null) {
-                    user = db.userDao().getUserById(uid)
-                }
+                if (uid != null) user = db.userDao().getUserById(uid)
             }
 
             if (user == null) {
@@ -86,7 +89,31 @@ class MainActivity : AppCompatActivity() {
 
             currentUser = user
             updateUI()
+
+            // 2. Sync Firestore → Room so local DB is always up to date
+            syncFromFirestore(user)
+
+            // 3. Refresh stats after sync
             refreshStats()
+        }
+    }
+
+    /**
+     * Pulls medicines and sales from Firestore into local Room.
+     * This is what makes data visible after a fresh install.
+     */
+    private suspend fun syncFromFirestore(user: User) {
+        try {
+            // Always sync medicines (all roles need the inventory)
+            medicineRepository.syncFromFirestore()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        try {
+            // Sync sales relevant to this user's role
+            saleRepository.syncFromFirestore(user.uid, user.role)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -94,61 +121,58 @@ class MainActivity : AppCompatActivity() {
         val user = currentUser ?: return
         findViewById<TextView>(R.id.tvPharmacyName).text = "MediQuick"
 
-        val roleDisplay = when(user.role) {
-            UserRole.ADMIN -> "System Administrator"
+        val roleDisplay = when (user.role) {
+            UserRole.ADMIN      -> "System Administrator"
             UserRole.PHARMACIST -> "Pharmacist"
-            UserRole.USER -> "Customer"
+            UserRole.USER       -> "Customer"
         }
         findViewById<TextView>(R.id.tvUserName).text = "$roleDisplay: ${user.name}"
 
-        val cardInventory = findViewById<View>(R.id.cardInventory)
-        val cardBilling = findViewById<View>(R.id.cardBilling)
-        val cardHistory = findViewById<View>(R.id.cardHistory)
-        val cardAlerts = findViewById<View>(R.id.cardAlerts)
-        val cardAddPharmacist = findViewById<View>(R.id.cardAddPharmacist)
+        val cardInventory       = findViewById<View>(R.id.cardInventory)
+        val cardBilling         = findViewById<View>(R.id.cardBilling)
+        val cardHistory         = findViewById<View>(R.id.cardHistory)
+        val cardAlerts          = findViewById<View>(R.id.cardAlerts)
+        val cardAddPharmacist   = findViewById<View>(R.id.cardAddPharmacist)
         val cardPharmacistStats = findViewById<View>(R.id.cardPharmacistStats)
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        val fab                 = findViewById<FloatingActionButton>(R.id.fab)
+        val tvHistoryTitle      = findViewById<TextView>(R.id.tvHistoryTitle)
+        val tvBillingTitle      = findViewById<TextView>(R.id.tvBillingTitle)
 
-        val tvHistoryTitle = findViewById<TextView>(R.id.tvHistoryTitle)
-        val tvBillingTitle = findViewById<TextView>(R.id.tvBillingTitle)
-
-        // Reset visibility
-        cardInventory.visibility = View.VISIBLE
-        cardBilling.visibility = View.VISIBLE
-        cardHistory.visibility = View.VISIBLE
-        cardAlerts.visibility = View.VISIBLE
-        cardAddPharmacist.visibility = View.GONE
+        cardInventory.visibility       = View.VISIBLE
+        cardBilling.visibility         = View.VISIBLE
+        cardHistory.visibility         = View.VISIBLE
+        cardAlerts.visibility          = View.VISIBLE
+        cardAddPharmacist.visibility   = View.GONE
         cardPharmacistStats.visibility = View.GONE
-        findViewById<View>(R.id.statCardRevenue).visibility = View.VISIBLE
+        findViewById<View>(R.id.statCardRevenue).visibility  = View.VISIBLE
         findViewById<View>(R.id.statCardLowStock).visibility = View.VISIBLE
-        findViewById<View>(R.id.filterLayout).visibility = View.VISIBLE
+        findViewById<View>(R.id.filterLayout).visibility    = View.VISIBLE
 
         when (user.role) {
             UserRole.ADMIN -> {
-                cardBilling.visibility = View.GONE
-                cardAddPharmacist.visibility = View.VISIBLE
-                fab.visibility = View.GONE
+                cardBilling.visibility         = View.GONE
+                cardAddPharmacist.visibility   = View.VISIBLE
+                fab.visibility                 = View.GONE
                 cardPharmacistStats.visibility = View.VISIBLE
-                tvHistoryTitle.text = "Sales History"
+                tvHistoryTitle.text            = "Sales History"
             }
             UserRole.PHARMACIST -> {
-                cardAddPharmacist.visibility = View.GONE
-                fab.visibility = View.VISIBLE
+                cardAddPharmacist.visibility   = View.GONE
+                fab.visibility                 = View.VISIBLE
                 cardPharmacistStats.visibility = View.GONE
-                tvHistoryTitle.text = "Sales History"
-                tvBillingTitle.text = "Create Sale"
+                tvHistoryTitle.text            = "Sales History"
+                tvBillingTitle.text            = "Create Sale"
             }
             UserRole.USER -> {
-                cardInventory.visibility = View.GONE
-                cardAlerts.visibility = View.GONE
+                cardInventory.visibility       = View.GONE
+                cardAlerts.visibility          = View.GONE
                 cardPharmacistStats.visibility = View.GONE
-                fab.visibility = View.GONE
-                tvHistoryTitle.text = "My Purchase History"
-                tvBillingTitle.text = "Order Medicines"
-
-                findViewById<View>(R.id.statCardRevenue).visibility = View.GONE
+                fab.visibility                 = View.GONE
+                tvHistoryTitle.text            = "My Purchase History"
+                tvBillingTitle.text            = "Order Medicines"
+                findViewById<View>(R.id.statCardRevenue).visibility  = View.GONE
                 findViewById<View>(R.id.statCardLowStock).visibility = View.GONE
-                findViewById<View>(R.id.filterLayout).visibility = View.GONE
+                findViewById<View>(R.id.filterLayout).visibility    = View.GONE
             }
         }
     }
@@ -171,26 +195,26 @@ class MainActivity : AppCompatActivity() {
     private fun refreshStats() {
         val user = currentUser ?: return
         lifecycleScope.launch {
-            val totalMeds = db.medicineDao().getCount()
-            val lowStockItems = db.medicineDao().getLowStockMedicines().first()
+            val totalMeds      = db.medicineDao().getCount()
+            val lowStockItems  = db.medicineDao().getLowStockMedicines().first()
 
             findViewById<TextView>(R.id.tvStatMedicines).text = totalMeds.toString()
-            findViewById<TextView>(R.id.tvStatLowStock).text = lowStockItems.size.toString()
+            findViewById<TextView>(R.id.tvStatLowStock).text  = lowStockItems.size.toString()
 
-            val statsVal = findViewById<TextView>(R.id.tvStatTotalSales)
+            val statsVal   = findViewById<TextView>(R.id.tvStatTotalSales)
             val statsLabel = findViewById<TextView>(R.id.tvStatTotalSalesLabel)
             val revenueVal = findViewById<TextView>(R.id.tvStatTodaySales)
 
             val startDate = getStartDate(selectedTimeFilter)
 
             val salesFlow = when (user.role) {
-                UserRole.ADMIN -> db.saleDao().getSalesFromDate(startDate)
+                UserRole.ADMIN      -> db.saleDao().getSalesFromDate(startDate)
                 UserRole.PHARMACIST -> db.saleDao().getSalesFromDateByPharmacist(user.uid, startDate)
-                UserRole.USER -> db.saleDao().getSalesFromDateByCustomer(user.uid, startDate)
+                UserRole.USER       -> db.saleDao().getSalesFromDateByCustomer(user.uid, startDate)
             }
 
             val sales = salesFlow.first()
-            statsVal.text = sales.size.toString()
+            statsVal.text  = sales.size.toString()
             statsLabel.text = if (user.role == UserRole.USER) "My Orders" else "Total Orders"
 
             val completedRevenue = sales.filter {
@@ -205,8 +229,8 @@ class MainActivity : AppCompatActivity() {
     private fun getStartDate(filter: String): String {
         val cal = Calendar.getInstance()
         when (filter) {
-            "Today" -> {}
-            "Last Week" -> cal.add(Calendar.DAY_OF_YEAR, -7)
+            "Today"      -> {}
+            "Last Week"  -> cal.add(Calendar.DAY_OF_YEAR, -7)
             "Last Month" -> cal.add(Calendar.MONTH, -1)
         }
         return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(cal.time)

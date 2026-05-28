@@ -17,6 +17,7 @@ import java.util.*
 class AddEditMedicineActivity : AppCompatActivity() {
 
     private lateinit var db: AppDatabase
+    private lateinit var medicineRepository: MedicineRepository
     private var editId: Long = 0
     private var selectedExpiry = ""
     private var selectedImageUri: Uri? = null
@@ -40,6 +41,7 @@ class AddEditMedicineActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_edit_medicine)
 
         db = AppDatabase.getDatabase(this)
+        medicineRepository = MedicineRepository(db.medicineDao())
 
         editId = intent.getLongExtra("medicine_id", 0)
         val isEdit = editId != 0L
@@ -73,7 +75,7 @@ class AddEditMedicineActivity : AppCompatActivity() {
 
         if (isEdit) {
             lifecycleScope.launch {
-                val medicine = db.medicineDao().getMedicineById(editId)
+                val medicine = medicineRepository.getMedicineById(editId)
                 medicine?.let { m ->
                     etName.setText(m.name)
                     val catIdx = MedicineConstants.CATEGORIES.indexOf(m.category).coerceAtLeast(0)
@@ -121,22 +123,25 @@ class AddEditMedicineActivity : AppCompatActivity() {
                 manufacturer = mfr,
                 minStock     = minStr.toIntOrNull() ?: 10,
                 imageUri     = selectedImageUri?.toString(),
-                addedBy      = if (isEdit) null else currentUid, // Don't overwrite addedBy if editing
+                addedBy      = if (isEdit) null else currentUid,
                 lastUpdatedBy = currentUid
             )
 
             lifecycleScope.launch {
                 if (isEdit) {
-                    // Fetch existing to preserve addedBy
-                    val existing = db.medicineDao().getMedicineById(editId)
+                    val existing = medicineRepository.getMedicineById(editId)
                     val toUpdate = med.copy(addedBy = existing?.addedBy ?: currentUid)
-                    db.medicineDao().updateMedicine(toUpdate)
+                    medicineRepository.update(toUpdate)
                 } else {
-                    db.medicineDao().insertMedicine(med)
+                    medicineRepository.insert(med)
                 }
 
                 runOnUiThread {
-                    Toast.makeText(this@AddEditMedicineActivity, if (isEdit) "Medicine updated!" else "Medicine added!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@AddEditMedicineActivity,
+                        if (isEdit) "Medicine updated!" else "Medicine added!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     finish()
                 }
             }

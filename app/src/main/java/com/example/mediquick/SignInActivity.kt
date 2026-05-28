@@ -24,13 +24,13 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
 
-        auth = FirebaseAuth.getInstance()
+        auth      = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-        db = AppDatabase.getDatabase(this)
+        db        = AppDatabase.getDatabase(this)
 
-        val etEmail     = findViewById<TextInputEditText>(R.id.etEmail)
-        val etPassword  = findViewById<TextInputEditText>(R.id.etPassword)
-        val tvError     = findViewById<TextView>(R.id.tvError)
+        val etEmail    = findViewById<TextInputEditText>(R.id.etEmail)
+        val etPassword = findViewById<TextInputEditText>(R.id.etPassword)
+        val tvError    = findViewById<TextView>(R.id.tvError)
 
         findViewById<Button>(R.id.btnSignIn).setOnClickListener {
             val email    = etEmail.text.toString().trim()
@@ -49,21 +49,23 @@ class SignInActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     val result = auth.signInWithEmailAndPassword(email, password).await()
-                    val uid = result.user?.uid ?: return@launch
-                    
-                    val doc = firestore.collection("users").document(uid).get().await()
+                    val uid    = result.user?.uid ?: return@launch
+
+                    val doc  = firestore.collection("users").document(uid).get().await()
                     val user = doc.toObject(User::class.java)
-                    
+
                     if (user != null) {
                         db.userDao().insertUser(user)
+                        // Delete old legacy SQLite DB (source of "Bruffin" ghost data)
+                        DatabaseHelper.deleteLegacyDatabase(this@SignInActivity)
                         UserPrefs.setLoggedIn(this@SignInActivity, true)
                         navigateToMain(user.name)
                     } else {
-                        tvError.text = "User data not found"
+                        tvError.text       = "User data not found"
                         tvError.visibility = View.VISIBLE
                     }
                 } catch (e: Exception) {
-                    tvError.text = e.message
+                    tvError.text       = e.message
                     tvError.visibility = View.VISIBLE
                 }
             }
@@ -77,13 +79,15 @@ class SignInActivity : AppCompatActivity() {
 
     private fun loginAsAdmin() {
         val adminUser = User(
-            uid = "ADMIN_ID",
-            name = "System Admin",
+            uid   = "ADMIN_ID",
+            name  = "System Admin",
             email = "admin@gmail.com",
-            role = UserRole.ADMIN
+            role  = UserRole.ADMIN
         )
         lifecycleScope.launch {
             db.userDao().insertUser(adminUser)
+            // Delete old legacy SQLite DB
+            DatabaseHelper.deleteLegacyDatabase(this@SignInActivity)
             UserPrefs.setLoggedIn(this@SignInActivity, true)
             navigateToMain("Admin")
         }
